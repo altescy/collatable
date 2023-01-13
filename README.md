@@ -44,7 +44,7 @@ with token_indexer.set(train=True), label_indexer.set(train=True):
             label,
             indexer=label_indexer,
         )
-        instance = Instance(text_field=text_field, label_field=label_field)
+        instance = Instance(text=text_field, label=label_field)
         instances.append(instance)
 
     # Collate instances: note that this should be done inside
@@ -57,8 +57,8 @@ print(output)
 Execution result:
 
 ```text
-{'label_field': array([0, 1, 0, 1], dtype=int32),
- 'text_field': {
+{'label': array([0, 1, 0, 1], dtype=int32),
+ 'text': {
     'token_ids': array([[ 3,  4,  5,  0,  0,  0,  0],
                         [ 3,  4,  6,  7,  8,  0,  0],
                         [ 3,  8,  4,  9,  5,  8,  0],
