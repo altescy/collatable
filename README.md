@@ -3,12 +3,11 @@
 [![Actions Status](https://github.com/altescy/collatable/workflows/CI/badge.svg)](https://github.com/altescy/collatable/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/altescy/collatable)](https://github.com/altescy/collatable/blob/main/LICENSE)
 
-
 ## Usage
 
 ### Example of text classification
 
-This is an example of building bached tensors with text classification dataset.
+This is an example of building batched tensors with text classification dataset.
 The following script shows how to tokenize/index/collate your dataset with `collatable`:
 
 ```python
