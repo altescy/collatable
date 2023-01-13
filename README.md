@@ -38,7 +38,7 @@ with token_indexer.set(train=True), label_indexer.set(train=True):
         text_field = TextField(
             text.split(),
             indexer=token_indexer,
-            padding_value=token_indexer["<pad>"],
+            padding_value=token_indexer[PAD_TOKEN],
         )
         label_field = LabelField(
             label,
