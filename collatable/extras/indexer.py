@@ -14,13 +14,13 @@ class Indexer(Generic[T_Value]):
         self,
         *,
         ignores: Iterable[T_Value] = (),
-        spetials: Sequence[T_Value] = (),
+        specials: Sequence[T_Value] = (),
         default: Optional[T_Value] = None,
     ) -> None:
-        if default is not None and default not in spetials:
-            raise ValueError("default value must be in spetials")
-        self._index_to_value: List[T_Value] = list(spetials)
-        self._value_to_index: Dict[T_Value, int] = {value: index for index, value in enumerate(spetials)}
+        if default is not None and default not in specials:
+            raise ValueError("default value must be in specials")
+        self._index_to_value: List[T_Value] = list(specials)
+        self._value_to_index: Dict[T_Value, int] = {value: index for index, value in enumerate(specials)}
         self._ignores: Set[T_Value] = set(ignores)
         self._default_value = default
         self._training = False

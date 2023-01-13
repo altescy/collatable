@@ -27,7 +27,7 @@ dataset = [
 # Set up indexers for tokens and labels
 PAD_TOKEN = "<PAD>"
 UNK_TOKEN = "<UNK>"
-token_indexer = TokenIndexer(spetials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
+token_indexer = TokenIndexer(specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
 label_indexer = LabelIndexer()
 
 instances: List[Instance] = []
