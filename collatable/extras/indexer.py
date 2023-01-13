@@ -35,6 +35,10 @@ class Indexer(Generic[T_Value]):
     def training(self) -> bool:
         return self._training
 
+    @property
+    def freezed(self) -> bool:
+        return not self._training
+
     def train(self) -> None:
         self._training = True
 
