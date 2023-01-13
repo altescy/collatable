@@ -35,6 +35,12 @@ class Indexer(Generic[T_Value]):
     def training(self) -> bool:
         return self._training
 
+    def train(self) -> None:
+        self._training = True
+
+    def frozen(self) -> None:
+        self._training = False
+
     @contextmanager
     def set(self, train: bool) -> Iterator[None]:
         prev_training = self._training
