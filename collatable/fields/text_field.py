@@ -1,3 +1,4 @@
+import copy
 from typing import Callable, Generic, Iterator, Mapping, Optional, Sequence, TypeVar, cast
 
 import numpy
@@ -6,11 +7,12 @@ from collatable.fields.field import PaddingValue
 from collatable.fields.sequence_field import SequenceField
 from collatable.typing import T_DataArray
 
+Self = TypeVar("Self", bound="TextField")
 Token = TypeVar("Token")
 
 
 class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
-    __slots__ = ["tokens", "indexer"]
+    __slots__ = ["tokens", "indexer", "padding_value"]
 
     def __init__(
         self,
@@ -40,6 +42,13 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
 
     def __getitem__(self, index: int) -> Token:
         return self.tokens[index]
+
+    def copy(self: Self) -> Self:
+        return self.__class__(
+            tokens=copy.deepcopy(self.tokens),
+            indexer=self.indexer,
+            padding_value=self.padding_value,
+        )
 
     def as_array(self) -> T_DataArray:
         return self.indexer(self.tokens)
