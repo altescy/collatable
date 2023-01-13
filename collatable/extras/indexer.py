@@ -49,8 +49,10 @@ class Indexer(Generic[T_Value]):
     def set(self, train: bool) -> Iterator[None]:
         prev_training = self._training
         self._training = train
-        yield
-        self._training = prev_training
+        try:
+            yield
+        finally:
+            self._training = prev_training
 
     def get_value_by_index(self, index: int) -> T_Value:
         return self._index_to_value[index]
