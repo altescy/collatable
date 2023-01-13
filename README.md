@@ -5,7 +5,7 @@
 
 ## Usage
 
-### Example of text classification
+### Text Classification Example
 
 This is an example of building batched tensors with text classification dataset.
 The following script shows how to tokenize/index/collate your dataset with `collatable`:
