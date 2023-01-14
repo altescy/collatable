@@ -27,8 +27,8 @@ dataset = [
 # Set up indexers for tokens and labels
 PAD_TOKEN = "<PAD>"
 UNK_TOKEN = "<UNK>"
-token_indexer = TokenIndexer(specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
-label_indexer = LabelIndexer()
+token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
+label_indexer = LabelIndexer[str]()
 
 instances: List[Instance] = []
 
@@ -47,6 +47,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
         instance = Instance(text=text_field, label=label_field)
         instances.append(instance)
 
+# Collate instances and build batch
 output = collatable.collate(instances)
 print(output)
 ```
