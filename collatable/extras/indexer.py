@@ -46,7 +46,7 @@ class Indexer(Generic[T_Value]):
         self._training = False
 
     @contextmanager
-    def set(self, train: bool) -> Iterator[None]:
+    def context(self, train: bool) -> Iterator[None]:
         prev_training = self._training
         self._training = train
         try:

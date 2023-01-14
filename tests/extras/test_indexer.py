@@ -6,7 +6,7 @@ from collatable.extras.indexer import TokenIndexer
 def test_token_indexer() -> None:
     tokens = list("abcde")
     indexer = TokenIndexer()
-    with indexer.set(train=True):
+    with indexer.context(train=True):
         for token in tokens:
             indexer[token]
 
