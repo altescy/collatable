@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "collatable"
-version = "0.1.0"
+version = "0.1.1"
 description = "Constructing batched tensors for any machine learning tasks"
 authors = ["altescy <altescy@fastmail.com>"]
 license = "MIT License"
