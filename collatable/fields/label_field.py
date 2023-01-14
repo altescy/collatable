@@ -18,7 +18,7 @@ class LabelField(Field[Tensor]):
         vocab: Optional[Mapping[str, int]] = None,
         indexer: Optional[Callable[[str], int]] = None,
     ) -> None:
-        if isinstance(label, str) and vocab is None and indexer is None:
+        if isinstance(label, str) and vocab is None is indexer:
             raise ValueError("LabelField with string labels requires vocab or indexer")
         if vocab is not None and indexer is not None:
             raise ValueError("Must specify either vocab or indexer.")

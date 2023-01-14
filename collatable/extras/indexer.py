@@ -151,14 +151,14 @@ class Indexer(Generic[T_Value]):
         return indexer
 
 
-class TokenIndexer(Indexer[str]):
-    def __call__(self, tokens: Sequence[str]) -> Dict[str, Tensor]:
+class TokenIndexer(Indexer[T_Value]):
+    def __call__(self, tokens: Sequence[T_Value]) -> Dict[str, Tensor]:
         return {
             "token_ids": numpy.array([self.get_index_by_value(value) for value in tokens], dtype=numpy.int64),
             "lengths": numpy.array(len(tokens), dtype=numpy.int64),
         }
 
 
-class LabelIndexer(Indexer[str]):
-    def __call__(self, label: str) -> int:
+class LabelIndexer(Indexer[T_Value]):
+    def __call__(self, label: T_Value) -> int:
         return self.get_index_by_value(label)

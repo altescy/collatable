@@ -1,7 +1,7 @@
-from typing import Dict, Iterator, Sequence
+from typing import Any, Dict, Iterator, Sequence
 
 from collatable.fields import Field
-from collatable.typing import Tensor
+from collatable.typing import DataArray
 
 
 class Instance:
@@ -18,14 +18,14 @@ class Instance:
         return self._fields[name]
 
     @staticmethod
-    def collate(instances: Sequence["Instance"]) -> Dict[str, Tensor]:
+    def collate(instances: Sequence["Instance"]) -> DataArray:
         keys = set(instances[0])
-        array: Dict[str, Tensor] = {}
+        array: Dict[str, Any] = {}
         for key in keys:
             values = [instance[key] for instance in instances]
             array[key] = values[0].collate(values)
         return array
 
 
-def collate(instances: Sequence[Instance]) -> Dict[str, Tensor]:
+def collate(instances: Sequence[Instance]) -> DataArray:
     return Instance.collate(instances)
