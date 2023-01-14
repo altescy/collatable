@@ -7,6 +7,12 @@
 
 Constructing batched tensors for any machine learning tasks
 
+## Installation
+
+```bash
+pip install collatable
+```
+
 ## Examples
 
 The following scripts show how to tokenize/index/collate your dataset with `collatable`:
