@@ -6,7 +6,7 @@ from collatable.typing import Tensor
 
 
 class SpanField(Field[Tensor]):
-    __slots__ = ["span_start", "span_end", "sequence_field"]
+    __slots__ = ["span_start", "span_end", "sequence_field", "padding_value"]
 
     def __init__(
         self,
