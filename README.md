@@ -33,7 +33,7 @@ label_indexer = LabelIndexer()
 instances: List[Instance] = []
 
 # Load training dataset
-with token_indexer.set(train=True), label_indexer.set(train=True):
+with token_indexer.context(train=True), label_indexer.context(train=True):
     for text, label in dataset:
         text_field = TextField(
             text.split(),
@@ -47,10 +47,7 @@ with token_indexer.set(train=True), label_indexer.set(train=True):
         instance = Instance(text=text_field, label=label_field)
         instances.append(instance)
 
-    # Collate instances: note that this should be done inside
-    # the with clause because indexing is conducted here.
-    output = collatable.collate(instances)
-
+output = collatable.collate(instances)
 print(output)
 ```
 
