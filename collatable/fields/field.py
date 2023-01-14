@@ -37,10 +37,12 @@ class Field(abc.ABC, Generic[T_DataArray]):
         arrays = cast(Sequence[T_DataArray], arrays)
         if isinstance(arrays[0], numpy.ndarray):
             return stack_with_padding(arrays, padding_value=self.padding_value[""])
+        if isinstance(arrays[0], list):
+            return list(arrays)
         if isinstance(arrays[0], dict):
             return {
                 key: stack_with_padding(
-                    [array[key] for array in arrays],
+                    [array[key] for array in arrays],  # type: ignore
                     padding_value=self.padding_value.get(key, 0),
                 )
                 for key in arrays[0]

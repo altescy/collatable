@@ -22,7 +22,7 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         indexer: Optional[Callable[[Sequence[Token]], T_DataArray]] = None,
         padding_value: PaddingValue = 0,
     ) -> None:
-        if (vocab is None and indexer is None) or (vocab is not None and indexer is not None):
+        if (vocab is None is indexer) or (vocab is not None and indexer is not None):
             raise ValueError("Must specify either vocab or indexer.")
         if vocab is not None:
             indexer = self._make_indexer(vocab)
