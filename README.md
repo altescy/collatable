@@ -20,8 +20,6 @@ The following scripts show how to tokenize/index/collate your dataset with `coll
 ### Text Classification
 
 ```python
-from typing import List
-
 import collatable
 from collatable import Instance, LabelField, MetadataField, TextField
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
@@ -40,7 +38,7 @@ token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_T
 label_indexer = LabelIndexer[str]()
 
 # Load training dataset
-instances: List[Instance] = []
+instances = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
     for id_, (text, label) in dataset:
         # Prepare each field with the corresponding field class
@@ -83,8 +81,6 @@ Execution result:
 ### Sequence Labeling
 
 ```python
-from typing import List
-
 import collatable
 from collatable import Instance, SequenceLabelField, TextField
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
@@ -100,7 +96,7 @@ token_indexer = TokenIndexer[str](specials=(PAD_TOKEN,))
 label_indexer = LabelIndexer[str]()
 
 # Load training dataset
-instances: List[Instance] = []
+instances = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
     for tokens, labels in dataset:
         text_field = TextField(tokens, indexer=token_indexer, padding_value=token_indexer[PAD_TOKEN])
