@@ -30,9 +30,8 @@ UNK_TOKEN = "<UNK>"
 token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
 label_indexer = LabelIndexer[str]()
 
-instances: List[Instance] = []
-
 # Load training dataset
+instances: List[Instance] = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
     for text, label in dataset:
         text_field = TextField(
