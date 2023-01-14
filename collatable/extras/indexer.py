@@ -93,8 +93,9 @@ class Indexer(Generic[T_Value]):
         default: Optional[T_Value] = None,
     ) -> "Indexer[T_Value]":
         indexer = cls(ignores=ignores, specials=specials, default=default)
-        for value in iterable:
-            indexer[value]
+        with indexer.context(train=True):
+            for value in iterable:
+                indexer[value]
         return indexer
 
     @classmethod
@@ -143,10 +144,10 @@ class Indexer(Generic[T_Value]):
         max_df = int(max_df) if isinstance(max_df, int) else int(max_df * num_documents)
 
         indexer = cls(ignores=ignores, specials=specials, default=default)
-
-        for token, df in list(value_to_df.items()):
-            if min_df <= df <= max_df:
-                indexer[token]
+        with indexer.context(train=True):
+            for token, df in list(value_to_df.items()):
+                if min_df <= df <= max_df:
+                    indexer[token]
 
         return indexer
 
