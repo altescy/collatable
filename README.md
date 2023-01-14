@@ -2,6 +2,10 @@
 
 [![Actions Status](https://github.com/altescy/collatable/workflows/CI/badge.svg)](https://github.com/altescy/collatable/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/altescy/collatable)](https://github.com/altescy/collatable/blob/main/LICENSE)
+[![Python version](https://img.shields.io/pypi/pyversions/collatable)](https://github.com/altescy/collatable)
+[![pypi version](https://img.shields.io/pypi/v/collatable)](https://pypi.org/project/collatable/)
+
+Constructing batched tensors for any machine learning tasks
 
 ## Examples
 
