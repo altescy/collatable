@@ -28,7 +28,8 @@ def test_instance() -> None:
                 metadata=MetadataField({"id": id_}),
             )
             instances.append(instance)
-        output = Instance.collate(instances)
+
+    output = Instance.collate(instances)
 
     assert isinstance(output, dict)
     assert set(output.keys()) == {"text", "label", "metadata"}
