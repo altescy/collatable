@@ -71,8 +71,7 @@ Execution result:
                         [ 3,  4,  6,  7,  8,  0,  0],
                         [ 3,  8,  4,  9,  5,  8,  0],
                         [ 3,  8,  4, 10,  7, 11, 12]]),
-    'lengths': array([3, 5, 6, 7])
- }}
+    'lengths': array([3, 5, 6, 7])}}
 ```
 
 ### Sequence Labeling
@@ -81,36 +80,25 @@ Execution result:
 from typing import List
 
 import collatable
-from collatable import Instance, LabelField, TextField
+from collatable import Instance, SequenceLabelField, TextField
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 
 dataset = [
-    ("this is awesome", "positive"),
-    ("this is a bad movie", "negative"),
-    ("this movie is an awesome movie", "positive"),
-    ("this movie is too bad to watch", "negative"),
+    (["my", "name", "is", "john", "smith"], ["O", "O", "O", "B", "I"]),
+    (["i", "lived", "in", "japan", "three", "years", "ago"], ["O", "O", "O", "U", "O", "O", "O"]),
 ]
 
 # Set up indexers for tokens and labels
 PAD_TOKEN = "<PAD>"
-UNK_TOKEN = "<UNK>"
-token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
+token_indexer = TokenIndexer[str](specials=(PAD_TOKEN,))
 label_indexer = LabelIndexer[str]()
 
-instances: List[Instance] = []
-
 # Load training dataset
+instances: List[Instance] = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
-    for text, label in dataset:
-        text_field = TextField(
-            text.split(),
-            indexer=token_indexer,
-            padding_value=token_indexer[PAD_TOKEN],
-        )
-        label_field = LabelField(
-            label,
-            indexer=label_indexer,
-        )
+    for tokens, labels in dataset:
+        text_field = TextField(tokens, indexer=token_indexer)
+        label_field = SequenceLabelField(labels, text_field, indexer=label_indexer)
         instance = Instance(text=text_field, label=label_field)
         instances.append(instance)
 
@@ -121,10 +109,10 @@ print(output)
 Execution result:
 
 ```text
-{'label': array([[0, 0, 0, 1, 2, 0, 0],
-                 [0, 0, 0, 3, 0, 0, 0]]),
- 'text': {
-   'lengths': array([5, 7]),
-   'token_ids': array([[ 0,  1,  2,  3,  4,  0,  0],
-                       [ 5,  6,  7,  8,  9, 10, 11]])}}
+{'text': {
+  'token_ids': array([[ 1,  2,  3,  4,  5,  0,  0],
+                     [ 6,  7,  8,  9, 10, 11, 12]]),
+  'lengths': array([5, 7])},
+ 'label': array([[0, 0, 0, 1, 2, 0, 0],
+                 [0, 0, 0, 3, 0, 0, 0]])}
 ```
