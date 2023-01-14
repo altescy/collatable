@@ -1,6 +1,6 @@
 import numpy
 
-from collatable.extras.indexer import LabelIndexer, TokenIndexer
+from collatable.extras.indexer import TokenIndexer
 from collatable.fields.sequence_label_field import SequenceLabelField
 from collatable.fields.text_field import TextField
 
