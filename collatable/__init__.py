@@ -5,8 +5,10 @@ from collatable.fields import (  # noqa: F401
     IndexField,
     LabelField,
     ListField,
+    MetadataField,
     ScalarField,
     SequenceField,
+    SequenceLabelField,
     TensorField,
     TextField,
 )
