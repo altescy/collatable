@@ -97,7 +97,7 @@ label_indexer = LabelIndexer[str]()
 instances: List[Instance] = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
     for tokens, labels in dataset:
-        text_field = TextField(tokens, indexer=token_indexer)
+        text_field = TextField(tokens, indexer=token_indexer, padding_value=token_indexer[PAD_TOKEN])
         label_field = SequenceLabelField(labels, text_field, indexer=label_indexer)
         instance = Instance(text=text_field, label=label_field)
         instances.append(instance)
