@@ -51,7 +51,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
             label,
             indexer=label_indexer,
         )
-        metadata_field = Metadata({"id": id_})
+        metadata_field = MetadataField({"id": id_})
         # Combine these fields into instance
         instance = Instance(
             text=text_field,
