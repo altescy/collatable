@@ -5,10 +5,9 @@
 
 ## Examples
 
-### Text Classification
+The following scripts show how to tokenize/index/collate your dataset with `collatable`:
 
-This is an example of building batched tensors with text classification dataset.
-The following script shows how to tokenize/index/collate your dataset with `collatable`:
+### Text Classification
 
 ```python
 from typing import List
