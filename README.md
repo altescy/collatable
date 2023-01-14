@@ -116,9 +116,71 @@ Execution result:
 
 ```text
 {'text': {
-  'token_ids': array([[ 1,  2,  3,  4,  5,  0,  0],
-                     [ 6,  7,  8,  9, 10, 11, 12]]),
-  'lengths': array([5, 7])},
+    'token_ids': array([[ 1,  2,  3,  4,  5,  0,  0],
+                        [ 6,  7,  8,  9, 10, 11, 12]]),
+    'lengths': array([5, 7])},
  'label': array([[0, 0, 0, 1, 2, 0, 0],
                  [0, 0, 0, 3, 0, 0, 0]])}
+```
+
+### Relation Extraction
+
+```python
+from collatable.extras.indexer import LabelIndexer, TokenIndexer
+from collatable.fields.adjacency_field import AdjacencyField
+from collatable.fields.list_field import ListField
+from collatable.fields.span_field import SpanField
+from collatable.fields.text_field import TextField
+from collatable.instance import Instance
+
+PAD_TOKEN = "<PAD>"
+token_indexer = TokenIndexer[str](specials=(PAD_TOKEN,))
+label_indexer = LabelIndexer[str]()
+
+instances = []
+with token_indexer.context(train=True), label_indexer.context(train=True):
+    text = TextField(
+        ["john", "smith", "was", "born", "in", "new", "york", "and", "now", "lives", "in", "tokyo"],
+        indexer=token_indexer,
+        padding_value=token_indexer[PAD_TOKEN],
+    )
+    spans = ListField([SpanField(0, 2, text), SpanField(5, 7, text), SpanField(11, 12, text)])
+    relations = AdjacencyField([(0, 1), (0, 2)], spans, labels=["born-in", "lives-in"], indexer=label_indexer)
+    instance = Instance(text=text, spans=spans, relations=relations)
+    instances.append(instance)
+
+    text = TextField(
+        ["tokyo", "is", "the", "capital", "of", "japan"],
+        indexer=token_indexer,
+        padding_value=token_indexer[PAD_TOKEN],
+    )
+    spans = ListField([SpanField(0, 1, text), SpanField(5, 6, text)])
+    relations = AdjacencyField([(0, 1)], spans, labels=["capital-of"], indexer=label_indexer)
+    instance = Instance(text=text, spans=spans, relations=relations)
+    instances.append(instance)
+
+output = Instance.collate(instances)
+print(output)
+```
+
+Execution result:
+
+```text
+{'text': {
+    'token_ids': array([[ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,  5, 11],
+                        [11, 12, 13, 14, 15, 16,  0,  0,  0,  0,  0,  0]]),
+    'lengths': array([12,  6])},
+ 'spans': array([[[ 0,  2],
+                  [ 5,  7],
+                  [11, 12]],
+                 [[ 0,  1],
+                  [ 5,  6],
+                  [-1, -1]]]),
+ 'relations': array([[[-1,  0,  1],
+                      [-1, -1, -1],
+                      [-1, -1, -1]],
+
+                     [[-1,  2, -1],
+                      [-1, -1, -1],
+                      [-1, -1, -1]]], dtype=int32)}
 ```
