@@ -141,6 +141,11 @@ class Dataset(Sequence[T]):
             pageio.flush()
         self._indexio.flush()
 
+    def close(self) -> None:
+        for pageio in self._pageios.values():
+            pageio.close()
+        self._indexio.close()
+
     def __len__(self) -> int:
         return len(self._indices)
 
