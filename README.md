@@ -40,7 +40,7 @@ label_indexer = LabelIndexer[str]()
 # Load training dataset
 instances = []
 with token_indexer.context(train=True), label_indexer.context(train=True):
-    for id_, (text, label) in dataset:
+    for id_, (text, label) in enumerate(dataset):
         # Prepare each field with the corresponding field class
         text_field = TextField(
             text.split(),
@@ -68,14 +68,17 @@ print(output)
 Execution result:
 
 ```text
-{'label': array([0, 1, 0, 1], dtype=int32),
- 'metadata': [{'id': 0}, {'id': 1}, {'id': 2}, {'id': 3}],
+{'metadata': [{'id': 0}, {'id': 1}, {'id': 2}, {'id': 3}],
  'text': {
-    'token_ids': array([[ 3,  4,  5,  0,  0,  0,  0],
-                        [ 3,  4,  6,  7,  8,  0,  0],
-                        [ 3,  8,  4,  9,  5,  8,  0],
-                        [ 3,  8,  4, 10,  7, 11, 12]]),
-    'lengths': array([3, 5, 6, 7])}}
+    'token_ids': array([[ 2,  3,  4,  0,  0,  0,  0],
+                        [ 2,  3,  5,  6,  7,  0,  0],
+                        [ 2,  7,  3,  8,  4,  7,  0],
+                        [ 2,  7,  3,  9,  6, 10, 11]]),
+    'mask': array([[ True,  True,  True, False, False, False, False],
+                   [ True,  True,  True,  True,  True, False, False],
+                   [ True,  True,  True,  True,  True,  True, False],
+                   [ True,  True,  True,  True,  True,  True,  True]])},
+    'label': array([0, 1, 0, 1], dtype=int32)}
 ```
 
 ### Sequence Labeling
@@ -111,23 +114,20 @@ print(output)
 Execution result:
 
 ```text
-{'text': {
+{'label': array([[0, 0, 0, 1, 2, 0, 0],
+                 [0, 0, 0, 3, 0, 0, 0]]),
+ 'text': {
     'token_ids': array([[ 1,  2,  3,  4,  5,  0,  0],
                         [ 6,  7,  8,  9, 10, 11, 12]]),
-    'lengths': array([5, 7])},
- 'label': array([[0, 0, 0, 1, 2, 0, 0],
-                 [0, 0, 0, 3, 0, 0, 0]])}
+    'mask': array([[ True,  True,  True,  True,  True, False, False],
+                   [ True,  True,  True,  True,  True,  True,  True]])}}
 ```
 
 ### Relation Extraction
 
 ```python
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
-from collatable.fields.adjacency_field import AdjacencyField
-from collatable.fields.list_field import ListField
-from collatable.fields.span_field import SpanField
-from collatable.fields.text_field import TextField
-from collatable.instance import Instance
+from collatable import AdjacencyField, Instance, ListField, SpanField, TextField
 
 PAD_TOKEN = "<PAD>"
 token_indexer = TokenIndexer[str](specials=(PAD_TOKEN,))
@@ -165,7 +165,8 @@ Execution result:
 {'text': {
     'token_ids': array([[ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,  5, 11],
                         [11, 12, 13, 14, 15, 16,  0,  0,  0,  0,  0,  0]]),
-    'lengths': array([12,  6])},
+    'mask': array([[ True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True],
+                   [ True,  True,  True,  True,  True,  True, False, False, False, False, False, False]])},
  'spans': array([[[ 0,  2],
                   [ 5,  7],
                   [11, 12]],
@@ -175,7 +176,6 @@ Execution result:
  'relations': array([[[-1,  0,  1],
                       [-1, -1, -1],
                       [-1, -1, -1]],
-
                      [[-1,  2, -1],
                       [-1, -1, -1],
                       [-1, -1, -1]]], dtype=int32)}

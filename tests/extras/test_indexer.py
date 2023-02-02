@@ -19,4 +19,4 @@ def test_token_indexer() -> None:
     array = indexer(tokens)
     assert isinstance(array, dict)
     assert array["token_ids"].tolist() == [0, 1, 2, 3, 4]
-    assert array["lengths"] == 5
+    assert array["mask"].sum() == 5

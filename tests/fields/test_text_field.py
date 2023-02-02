@@ -10,9 +10,9 @@ def test_text_field_can_be_converted_to_array() -> None:
     field = TextField[str, Dict[str, Tensor]](tokens, vocab=vocab)
     output = field.as_array()
     assert isinstance(output, dict)
-    assert output.keys() == {"token_ids", "lengths"}
+    assert output.keys() == {"token_ids", "mask"}
     assert output["token_ids"].tolist() == [3, 1, 0, 2]
-    assert output["lengths"] == 4
+    assert output["mask"].tolist() == [True, True, True, True]
 
 
 def test_text_field_can_be_collated() -> None:
@@ -24,6 +24,6 @@ def test_text_field_can_be_collated() -> None:
     ]
     output = fields[0].collate(fields)
     assert isinstance(output, dict)
-    assert output.keys() == {"token_ids", "lengths"}
+    assert output.keys() == {"token_ids", "mask"}
     assert output["token_ids"].tolist() == [[3, 2, 0, 1, 5, -1], [3, 2, 0, 4, 5, 6]]
-    assert output["lengths"].tolist() == [5, 6]
+    assert output["mask"].sum(1).tolist() == [5, 6]
