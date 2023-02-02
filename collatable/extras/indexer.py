@@ -154,10 +154,9 @@ class Indexer(Generic[T_Value]):
 
 class TokenIndexer(Indexer[T_Value]):
     def __call__(self, tokens: Sequence[T_Value]) -> Dict[str, Tensor]:
-        return {
-            "token_ids": numpy.array([self.get_index_by_value(value) for value in tokens], dtype=numpy.int64),
-            "lengths": numpy.array(len(tokens), dtype=numpy.int64),
-        }
+        token_ids = numpy.array([self.get_index_by_value(value) for value in tokens], dtype=numpy.int64)
+        mask = numpy.ones_like(token_ids, dtype=bool)
+        return {"token_ids": token_ids, "mask": mask}
 
 
 class LabelIndexer(Indexer[T_Value]):

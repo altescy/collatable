@@ -60,10 +60,9 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
     @staticmethod
     def _make_indexer(vocab: Mapping[Token, int]) -> Callable[[Sequence[Token]], T_DataArray]:
         def indexer(tokens: Sequence[Token]) -> T_DataArray:
-            output = {
-                "token_ids": numpy.array([vocab[token] for token in tokens], dtype=numpy.int64),
-                "lengths": numpy.array(len(tokens), dtype=numpy.int64),
-            }
+            token_ids = numpy.array([vocab[token] for token in tokens], dtype=numpy.int64)
+            mask = numpy.ones_like(token_ids, dtype=bool)
+            output = {"token_ids": token_ids, "mask": mask}
             return cast(T_DataArray, output)
 
         return indexer
