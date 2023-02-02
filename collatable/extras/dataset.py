@@ -2,10 +2,9 @@ import json
 import pickle
 import shutil
 import tempfile
-from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import BinaryIO, Dict, Iterable, List, NamedTuple, Optional, Tuple, TypeVar, Union, cast, overload
+from typing import BinaryIO, Dict, Iterable, List, NamedTuple, Optional, Sequence, Tuple, TypeVar, Union, cast, overload
 
 T = TypeVar("T")
 Self = TypeVar("Self", bound="Dataset")
