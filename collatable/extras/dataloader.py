@@ -1,7 +1,6 @@
 import math
+import random
 from typing import Dict, Iterator, Sequence, TypeVar
-
-import numpy
 
 from collatable.instance import Instance
 from collatable.typing import DataArray
@@ -28,9 +27,9 @@ class DataLoader:
         return math.ceil(len(self._dataset) / self._batch_size)
 
     def __iter__(self) -> Iterator[Dict[str, DataArray]]:
-        indices = numpy.arange(len(self._dataset))
+        indices = list(range(len(self._dataset)))
         if self._shuffle:
-            numpy.random.shuffle(indices)
+            random.shuffle(indices)
         for i in range(0, len(self._dataset), self._batch_size):
             if self._drop_last and i + self._batch_size > len(self._dataset):
                 break

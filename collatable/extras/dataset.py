@@ -4,7 +4,21 @@ import shutil
 import tempfile
 from os import PathLike
 from pathlib import Path
-from typing import BinaryIO, Dict, Iterable, List, NamedTuple, Optional, Sequence, Tuple, TypeVar, Union, cast, overload
+from typing import (
+    BinaryIO,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 T = TypeVar("T")
 Self = TypeVar("Self", bound="Dataset")
@@ -95,12 +109,10 @@ class Dataset(Sequence[T]):
     def _load_indices(self) -> None:
         if self._indices:
             raise RuntimeError("indices already loaded")
+        eof = self._indexio.seek(0, 2)
         self._indexio.seek(0)
-        while True:
-            try:
-                self._indices.append(Index.from_binaryio(self._indexio))
-            except EOFError:
-                break
+        while self._indexio.tell() < eof:
+            self._indices.append(Index.from_binaryio(self._indexio))
 
     def _load_metadata(self) -> None:
         metadata_filename = self._get_metadata_filename()
@@ -180,3 +192,10 @@ class Dataset(Sequence[T]):
             dataset.append(obj)
         dataset.flush()
         return dataset
+
+    @classmethod
+    def from_path(
+        cls: Type[Self],
+        path: Union[str, PathLike],
+    ) -> Self:
+        return cls(path)
