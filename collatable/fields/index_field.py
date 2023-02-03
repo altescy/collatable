@@ -15,6 +15,12 @@ class IndexField(Field[Tensor]):
         super().__init__(padding_value=-1)
         self._index = index
 
+    def __str__(self) -> str:
+        return str(self._index)
+
+    def __repr__(self) -> str:
+        return f"IndexField(index={self._index})"
+
     @property
     def index(self) -> int:
         return self._index

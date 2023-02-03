@@ -35,6 +35,12 @@ class LabelField(Field[Tensor]):
             assert indexer is not None
             self._label_index = indexer(label)
 
+    def __str__(self) -> str:
+        return str(self._label)
+
+    def __repr__(self) -> str:
+        return f"LabelField(label={self._label})"
+
     @property
     def label(self) -> Union[int, str]:
         return self._label

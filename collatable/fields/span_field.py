@@ -29,6 +29,12 @@ class SpanField(Field[Tensor]):
         self._span_start = span_start
         self._span_end = span_end
 
+    def __str__(self) -> str:
+        return f"({self.span_start}, {self.span_end})"
+
+    def __repr__(self) -> str:
+        return f"SpanField(span_start={self.span_start}, span_end={self.span_end}, padding_value={self.padding_value})"
+
     @property
     def span_start(self) -> int:
         return self._span_start

@@ -20,5 +20,11 @@ class ScalarField(Field[Tensor]):
         super().__init__(padding_value=padding_value)
         self._value: T_Scalar = value
 
+    def __str__(self) -> str:
+        return str(self._value)
+
+    def __repr__(self) -> str:
+        return f"ScalarField(value={self._value}, padding_value={self._padding_value})"
+
     def as_array(self) -> Tensor:
         return numpy.array(self._value)

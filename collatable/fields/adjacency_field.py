@@ -48,6 +48,12 @@ class AdjacencyField(Field[Tensor]):
                 assert indexer is not None
                 self._indexed_labels = [indexer(label) for label in cast(Sequence[str], self._labels)]
 
+    def __str__(self) -> str:
+        return f"[{', '.join(str(index) for index in self._indices)}]"
+
+    def __repr__(self) -> str:
+        return f"AdjacencyField(indices={self._indices}, padding_value={self._padding_value})"
+
     @staticmethod
     def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:
         def indexer(label: str) -> int:

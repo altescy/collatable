@@ -47,6 +47,12 @@ class SequenceLabelField(SequenceField[Tensor]):
     def __getitem__(self, index: int) -> Union[int, str]:
         return self._labels[index]
 
+    def __str__(self) -> str:
+        return f"[{', '.join(str(label) for label in self._labels)}]"
+
+    def __repr__(self) -> str:
+        return f"SequenceLabelField(labels={self._labels}, padding_value={self._padding_value})"
+
     @property
     def labels(self) -> Union[Sequence[int], Sequence[str]]:
         return self._labels

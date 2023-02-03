@@ -27,5 +27,11 @@ class TensorField(Field[Tensor]):
             return numpy.array_equal(self.tensor, other.tensor) and self.padding_value == other.padding_value
         return NotImplemented
 
+    def __str__(self) -> str:
+        return str(self._tensor)
+
+    def __repr__(self) -> str:
+        return f"TensorField(tensor={self._tensor}, padding_value={self._padding_value})"
+
     def as_array(self) -> Tensor:
         return self._tensor

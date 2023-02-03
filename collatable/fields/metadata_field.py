@@ -10,6 +10,12 @@ class MetadataField(Field):
         super().__init__()
         self._metadata = metadata
 
+    def __str__(self) -> str:
+        return str(self._metadata)
+
+    def __repr__(self) -> str:
+        return f"MetadataField(metadata={self._metadata})"
+
     @property
     def metadata(self) -> Any:
         return self._metadata

@@ -42,6 +42,12 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
     def __getitem__(self, index: int) -> Token:
         return self.tokens[index]
 
+    def __str__(self) -> str:
+        return f"[{', '.join(str(token) for token in self.tokens)}]"
+
+    def __repr__(self) -> str:
+        return f"TextField(tokens={self.tokens}, padding_value={self._padding_value})"
+
     @property
     def tokens(self) -> Sequence[Token]:
         return self._tokens
