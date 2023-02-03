@@ -7,7 +7,7 @@ from collatable.typing import ArrayLike, Tensor
 
 
 class TensorField(Field[Tensor]):
-    __slots__ = ["tensor", "padding_value"]
+    __slots__ = ["_tensor", "_padding_value"]
 
     def __init__(
         self,
@@ -15,7 +15,11 @@ class TensorField(Field[Tensor]):
         padding_value: ArrayLike = 0,
     ) -> None:
         super().__init__(padding_value=padding_value)
-        self.tensor = tensor
+        self._tensor = tensor
+
+    @property
+    def tensor(self) -> Tensor:
+        return self._tensor
 
     def __eq__(self, other: object) -> bool:
         if isinstance(self, other.__class__):
@@ -23,5 +27,11 @@ class TensorField(Field[Tensor]):
             return numpy.array_equal(self.tensor, other.tensor) and self.padding_value == other.padding_value
         return NotImplemented
 
+    def __str__(self) -> str:
+        return str(self._tensor)
+
+    def __repr__(self) -> str:
+        return f"TensorField(tensor={self._tensor}, padding_value={self._padding_value})"
+
     def as_array(self) -> Tensor:
-        return self.tensor
+        return self._tensor

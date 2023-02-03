@@ -9,7 +9,7 @@ Self = TypeVar("Self", bound="LabelField")
 
 
 class LabelField(Field[Tensor]):
-    __slots__ = ["label", "label_index", "indexer"]
+    __slots__ = ["_label", "_label_index"]
 
     def __init__(
         self,
@@ -27,19 +27,26 @@ class LabelField(Field[Tensor]):
             indexer = self._make_indexer(vocab)
 
         super().__init__()
-        self.label = label
-        self.indexer = indexer
+        self._label = label
+        self._label_index: int
         if isinstance(label, int):
-            self.label_index = label
+            self._label_index = label
         else:
             assert indexer is not None
-            self.label_index = indexer(label)
+            self._label_index = indexer(label)
 
-    def copy(self: Self) -> Self:
-        return self.__class__(label=self.label, indexer=self.indexer)
+    def __str__(self) -> str:
+        return str(self._label)
+
+    def __repr__(self) -> str:
+        return f"LabelField(label={self._label})"
+
+    @property
+    def label(self) -> Union[int, str]:
+        return self._label
 
     def as_array(self) -> Tensor:
-        return numpy.array(self.label_index, dtype=numpy.int32)
+        return numpy.array(self._label_index, dtype=numpy.int32)
 
     @staticmethod
     def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:

@@ -1,4 +1,4 @@
-from typing import Callable, Mapping, Optional, Sequence, Union, cast
+from typing import Callable, Iterator, Mapping, Optional, Sequence, Union, cast
 
 import numpy
 
@@ -8,9 +8,11 @@ from collatable.typing import Tensor
 
 
 class SequenceLabelField(SequenceField[Tensor]):
+    __slots__ = ["_labels", "_indexed_labels"]
+
     def __init__(
         self,
-        labels: Union[Sequence[str], Sequence[int]],
+        labels: Union[Sequence[int], Sequence[str]],
         sequence_field: SequenceField,
         *,
         vocab: Optional[Mapping[str, int]] = None,
@@ -26,17 +28,37 @@ class SequenceLabelField(SequenceField[Tensor]):
 
         super().__init__(padding_value=padding_value)
 
-        self.labels: Union[Sequence[str], Sequence[int]] = labels
-        self.indexer = indexer
-        self.sequence_field = sequence_field
+        self._labels = labels
         self._indexed_labels: Sequence[int]
-        if isinstance(self.labels[0], int):
-            self._indexed_labels = cast(Sequence[int], self.labels)
+        if isinstance(self._labels[0], int):
+            self._indexed_labels = cast(Sequence[int], self._labels)
         else:
-            if self.indexer is None:
+            if indexer is None:
                 raise ValueError("Indexer must be specified if labels are strings.")
-            self.labels = cast(Sequence[str], self.labels)
-            self._indexed_labels = [self.indexer(label) for label in self.labels]
+            self._labels = self._labels
+            self._indexed_labels = [indexer(label) for label in cast(Sequence[str], self._labels)]
+
+    def __len__(self) -> int:
+        return len(self._labels)
+
+    def __iter__(self) -> Iterator[Union[int, str]]:
+        return iter(self._labels)
+
+    def __getitem__(self, index: int) -> Union[int, str]:
+        return self._labels[index]
+
+    def __str__(self) -> str:
+        return f"[{', '.join(str(label) for label in self._labels)}]"
+
+    def __repr__(self) -> str:
+        return f"SequenceLabelField(labels={self._labels}, padding_value={self._padding_value})"
+
+    @property
+    def labels(self) -> Union[Sequence[int], Sequence[str]]:
+        return self._labels
+
+    def as_array(self) -> Tensor:
+        return numpy.array(self._indexed_labels)
 
     @staticmethod
     def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:
@@ -44,6 +66,3 @@ class SequenceLabelField(SequenceField[Tensor]):
             return vocab[label]
 
         return indexer
-
-    def as_array(self) -> Tensor:
-        return numpy.array(self._indexed_labels)

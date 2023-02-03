@@ -18,7 +18,7 @@ class Field(abc.ABC, Generic[T_DataArray]):
         if not isinstance(padding_value, dict):
             padding_value = {"": padding_value}
 
-        self.padding_value = padding_value
+        self._padding_value = padding_value
 
     def __eq__(self: Self, other: object) -> bool:
         if isinstance(self, other.__class__):
@@ -30,6 +30,10 @@ class Field(abc.ABC, Generic[T_DataArray]):
                 return self.__dict__ == other.__dict__
             return True
         return NotImplemented
+
+    @property
+    def padding_value(self) -> Dict[str, ArrayLike]:
+        return self._padding_value
 
     def collate(self: Self, arrays: Union[Sequence[T_DataArray], Sequence[Self]]) -> T_DataArray:
         if isinstance(arrays[0], Field):
