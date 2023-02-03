@@ -1,11 +1,9 @@
 import math
 import random
-from typing import Dict, Iterator, Sequence, TypeVar
+from typing import Dict, Iterator, Sequence
 
 from collatable.instance import Instance
 from collatable.typing import DataArray
-
-T = TypeVar("T")
 
 
 class DataLoader:
