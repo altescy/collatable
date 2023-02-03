@@ -6,7 +6,7 @@ from collatable.typing import Tensor
 
 
 class SpanField(Field[Tensor]):
-    __slots__ = ["span_start", "span_end", "sequence_field", "padding_value"]
+    __slots__ = ["_span_start", "_span_end", "_padding_value"]
 
     def __init__(
         self,
@@ -26,9 +26,16 @@ class SpanField(Field[Tensor]):
 
         super().__init__(padding_value=padding_value)
 
-        self.span_start = span_start
-        self.span_end = span_end
-        self.sequence_field = sequence_field
+        self._span_start = span_start
+        self._span_end = span_end
+
+    @property
+    def span_start(self) -> int:
+        return self._span_start
+
+    @property
+    def span_end(self) -> int:
+        return self._span_end
 
     def as_array(self) -> Tensor:
         return numpy.array([self.span_start, self.span_end])

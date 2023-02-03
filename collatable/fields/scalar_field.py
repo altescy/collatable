@@ -8,7 +8,7 @@ from collatable.util import get_scalar_default_value
 
 
 class ScalarField(Field[Tensor]):
-    __slots__ = ["value", "padding_value"]
+    __slots__ = ["_value", "_padding_value"]
 
     def __init__(
         self,
@@ -18,7 +18,7 @@ class ScalarField(Field[Tensor]):
         if padding_value is None:
             padding_value = get_scalar_default_value(type(value))
         super().__init__(padding_value=padding_value)
-        self.value: T_Scalar = value
+        self._value: T_Scalar = value
 
     def as_array(self) -> Tensor:
-        return numpy.array(self.value)
+        return numpy.array(self._value)

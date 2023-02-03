@@ -1,4 +1,3 @@
-import copy
 from typing import Callable, Mapping, Optional, Sequence, Tuple, TypeVar, Union, cast
 
 import numpy
@@ -11,7 +10,7 @@ Self = TypeVar("Self", bound="AdjacencyField")
 
 
 class AdjacencyField(Field[Tensor]):
-    __slots__ = ["indices", "labels", "sequence_field", "indexer", "_indexed_labels", "padding_value"]
+    __slots__ = ["_indices", "_labels", "_indexed_labels", "_sequence_length", "_padding_value"]
 
     def __init__(
         self,
@@ -38,16 +37,16 @@ class AdjacencyField(Field[Tensor]):
 
         super().__init__(padding_value=padding_value)
 
-        self.indices = indices
-        self.labels = labels
-        self.sequence_field = sequence_field
-        self.indexer = indexer
-        if self.labels:
-            if isinstance(self.labels[0], int):
-                self._indexed_labels = cast(Sequence[int], self.labels)
+        self._indices = indices
+        self._labels = labels
+        self._sequence_length = len(sequence_field)
+        self._indexed_labels: Optional[Sequence[int]]
+        if self._labels:
+            if isinstance(self._labels[0], int):
+                self._indexed_labels = cast(Sequence[int], self._labels)
             else:
-                assert self.indexer is not None
-                self._indexed_labels = [self.indexer(label) for label in cast(Sequence[str], self.labels)]
+                assert indexer is not None
+                self._indexed_labels = [indexer(label) for label in cast(Sequence[str], self._labels)]
 
     @staticmethod
     def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:
@@ -56,24 +55,14 @@ class AdjacencyField(Field[Tensor]):
 
         return indexer
 
-    def copy(self: Self) -> Self:
-        output = self.__class__(
-            indices=copy.deepcopy(self.indices),
-            sequence_field=self.sequence_field,
-            labels=copy.deepcopy(self.labels),
-            indexer=self.indexer,
-            padding_value=self.padding_value,
-        )
-        output._indexed_labels = copy.deepcopy(self._indexed_labels)
-        return output
-
     def as_array(self) -> Tensor:
         array = numpy.full(
-            (len(self.sequence_field), len(self.sequence_field)),
+            (self._sequence_length, self._sequence_length),
             self.padding_value[""],
             dtype=numpy.int32,
         )
-        labels = self._indexed_labels if self.labels is not None else [1] * len(self.indices)
-        for (i, j), label in zip(self.indices, labels):
+        labels = self._indexed_labels if self._labels is not None else [1] * len(self._indices)
+        assert labels is not None
+        for (i, j), label in zip(self._indices, labels):
             array[i, j] = label
         return array

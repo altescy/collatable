@@ -1,4 +1,3 @@
-import copy
 from typing import Callable, Generic, Iterator, Mapping, Optional, Sequence, TypeVar, cast
 
 import numpy
@@ -12,7 +11,7 @@ Token = TypeVar("Token")
 
 
 class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
-    __slots__ = ["tokens", "indexer", "padding_value", "_indexed_tokens"]
+    __slots__ = ["_tokens", "_padding_value", "_indexed_tokens"]
 
     def __init__(
         self,
@@ -21,7 +20,6 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         vocab: Optional[Mapping[Token, int]] = None,
         indexer: Optional[Callable[[Sequence[Token]], T_DataArray]] = None,
         padding_value: PaddingValue = 0,
-        lazy: bool = False,
     ) -> None:
         if (vocab is None is indexer) or (vocab is not None and indexer is not None):
             raise ValueError("Must specify either vocab or indexer.")
@@ -32,9 +30,8 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
 
         super().__init__(padding_value=padding_value)
 
-        self.tokens: Sequence[Token] = tokens
-        self.indexer: Callable[[Sequence[Token]], T_DataArray] = indexer
-        self._indexed_tokens: Optional[T_DataArray] = None if lazy else self.indexer(self.tokens)
+        self._tokens = tokens
+        self._indexed_tokens: T_DataArray = indexer(self.tokens)
 
     def __len__(self) -> int:
         return len(self.tokens)
@@ -45,17 +42,12 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
     def __getitem__(self, index: int) -> Token:
         return self.tokens[index]
 
-    def copy(self: Self) -> Self:
-        field = self.__class__(
-            tokens=copy.deepcopy(self.tokens),
-            indexer=self.indexer,
-            padding_value=copy.deepcopy(self.padding_value),
-        )
-        field._indexed_tokens = copy.deepcopy(self._indexed_tokens)
-        return field
+    @property
+    def tokens(self) -> Sequence[Token]:
+        return self._tokens
 
     def as_array(self) -> T_DataArray:
-        return self._indexed_tokens or self.indexer(self.tokens)
+        return self._indexed_tokens
 
     @staticmethod
     def _make_indexer(vocab: Mapping[Token, int]) -> Callable[[Sequence[Token]], T_DataArray]:
