@@ -2,6 +2,7 @@ import math
 import random
 from typing import Dict, Iterator, Sequence
 
+from collatable.collator import Collator
 from collatable.instance import Instance
 from collatable.typing import DataArray
 
@@ -18,6 +19,7 @@ class DataLoader:
         self._batch_size = batch_size
         self._shuffle = shuffle
         self._drop_last = drop_last
+        self._collator = Collator()
 
     def __len__(self) -> int:
         if self._drop_last:
@@ -33,4 +35,4 @@ class DataLoader:
                 break
             batch_indices = indices[i : i + self._batch_size]
             batch = [self._dataset[j] for j in batch_indices]
-            yield Instance.collate(batch)
+            yield self._collator(batch)

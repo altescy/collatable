@@ -1,5 +1,6 @@
 import numpy
 
+from collatable.collator import collate
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 from collatable.fields.adjacency_field import AdjacencyField
 from collatable.fields.list_field import ListField
@@ -35,7 +36,7 @@ def test_adajacency_field() -> None:
         instance = Instance(text=text, spans=spans, relations=relations)
         instances.append(instance)
 
-    output = Instance.collate(instances)["relations"]
+    output = collate(instances)["relations"]
     assert isinstance(output, numpy.ndarray)
     assert output.shape == (2, 3, 3)
 

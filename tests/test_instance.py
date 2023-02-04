@@ -2,6 +2,7 @@ from typing import List
 
 import numpy
 
+from collatable.collator import Collator
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 from collatable.fields import LabelField, MetadataField, TextField
 from collatable.instance import Instance
@@ -29,7 +30,8 @@ def test_instance() -> None:
             )
             instances.append(instance)
 
-    output = Instance.collate(instances)
+    collator = Collator()
+    output = collator(instances)
 
     assert isinstance(output, dict)
     assert set(output.keys()) == {"text", "label", "metadata"}
