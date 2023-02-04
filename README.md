@@ -78,7 +78,7 @@ Execution result:
                    [ True,  True,  True,  True,  True, False, False],
                    [ True,  True,  True,  True,  True,  True, False],
                    [ True,  True,  True,  True,  True,  True,  True]])},
-    'label': array([0, 1, 0, 1], dtype=int32)}
+ 'label': array([0, 1, 0, 1], dtype=int32)}
 ```
 
 ### Sequence Labeling
