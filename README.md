@@ -126,6 +126,7 @@ Execution result:
 ### Relation Extraction
 
 ```python
+import collatable
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 from collatable import AdjacencyField, Instance, ListField, SpanField, TextField
 
@@ -155,7 +156,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
     instance = Instance(text=text, spans=spans, relations=relations)
     instances.append(instance)
 
-output = Instance.collate(instances)
+output = collatable.collate(instances)
 print(output)
 ```
 
