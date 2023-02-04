@@ -43,11 +43,14 @@ def test_dataloader() -> None:
 
     dataset = Dataset.from_iterable(read_dataset())
 
-    dataloader = DataLoader(dataset, batch_size=2)
-    assert len(dataloader) == 2
+    dataloader = DataLoader(batch_size=2)
+    batch_iterator = dataloader(dataset)
+    assert len(batch_iterator) == 2
 
-    dataloader = DataLoader(dataset, batch_size=3, drop_last=True)
-    assert len(dataloader) == 1
+    dataloader = DataLoader(batch_size=3, drop_last=True)
+    batch_iterator = dataloader(dataset)
+    assert len(batch_iterator) == 1
 
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
-    assert all(len(batch["label"]) == 2 for batch in dataloader)
+    dataloader = DataLoader(batch_size=2, shuffle=True)
+    batch_iterator = dataloader(dataset)
+    assert all(len(batch["label"]) == 2 for batch in batch_iterator)
