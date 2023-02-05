@@ -1,3 +1,4 @@
+import pickle
 from pathlib import Path
 from typing import Any, Dict, Iterator
 
@@ -32,4 +33,23 @@ def test_dataset_can_be_restored(tmp_path: Path) -> None:
     assert dataset_path.exists()
 
     dataset = Dataset.from_path(dataset_path)
+    assert len(dataset) == 100
+
+
+def test_dataset_can_be_pickled(tmp_path: Path) -> None:
+    def iterator() -> Iterator[str]:
+        for i in range(100):
+            yield f"this is a document {i}"
+
+    dataset_path = tmp_path / "dataset"
+    dataset = Dataset.from_iterable(iterator(), path=dataset_path)
+    assert len(dataset) == 100
+
+    pickled_dataset = pickle.dumps(dataset)
+
+    del dataset
+    assert dataset_path.exists()
+
+    dataset = pickle.loads(pickled_dataset)
+
     assert len(dataset) == 100

@@ -2,12 +2,15 @@ import json
 import pickle
 import shutil
 import tempfile
+from contextlib import contextmanager
 from os import PathLike
 from pathlib import Path
 from typing import (
+    Any,
     BinaryIO,
     Dict,
     Iterable,
+    Iterator,
     List,
     NamedTuple,
     Optional,
@@ -54,6 +57,9 @@ class Dataset(Sequence[T]):
         self._pageios: Dict[int, BinaryIO] = {}
 
         self._path.mkdir(parents=True, exist_ok=True)
+        self._restore()
+
+    def _restore(self) -> None:
         index_filename = self._get_index_filename()
         if not index_filename.exists():
             index_filename.touch()
@@ -92,6 +98,9 @@ class Dataset(Sequence[T]):
 
     def _get_metadata_filename(self) -> Path:
         return self._path / "metadata.json"
+
+    def _get_lock_filename(self) -> Path:
+        return self._path / "lock"
 
     def _get_page_filename(self, page: int) -> Path:
         return self._path / f"page_{page:08d}"
@@ -158,6 +167,18 @@ class Dataset(Sequence[T]):
             pageio.close()
         self._indexio.close()
 
+    @contextmanager
+    def lock(self) -> Iterator[None]:
+        import fcntl
+
+        lockfile = self._get_lock_filename().open("w")
+        try:
+            fcntl.flock(lockfile, fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(lockfile, fcntl.LOCK_UN)
+            lockfile.close()
+
     def __len__(self) -> int:
         return len(self._indices)
 
@@ -179,6 +200,19 @@ class Dataset(Sequence[T]):
             return self._decode(pageio.read(index.length))
         else:
             raise TypeError(f"key must be int or slice, not {type(key)}")
+
+    def __getstate__(self) -> Dict[str, Any]:
+        if self._delete_on_exit:
+            raise RuntimeError("cannot pickle a temporary database")
+        return {"path": self._path}
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self._path = state["path"]
+        self._delete_on_exit = False
+        self._pagesize = 1024 * 1024 * 1024
+        self._indices = []
+        self._pageios = {}
+        self._restore()
 
     @classmethod
     def from_iterable(
