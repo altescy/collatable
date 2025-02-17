@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from collatable import Instance, LabelField, MetadataField, TextField
+from collatable import LabelField, MetadataField, TextField
 from collatable.extras.dataloader import DataLoader
 from collatable.extras.dataset import Dataset
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
@@ -12,7 +12,7 @@ def test_dataloader() -> None:
     token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
     label_indexer = LabelIndexer[str]()
 
-    def read_dataset() -> Iterator[Instance]:
+    def read_dataset() -> Iterator[dict]:
         dataset = [
             ("this is awesome", "positive"),
             ("this is a bad movie", "negative"),
@@ -34,7 +34,7 @@ def test_dataloader() -> None:
                 )
                 metadata_field = MetadataField({"id": id_})
                 # Combine these fields into instance
-                instance = Instance(
+                instance = dict(
                     text=text_field,
                     label=label_field,
                     metadata=metadata_field,

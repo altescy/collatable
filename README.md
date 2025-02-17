@@ -21,7 +21,7 @@ The following scripts show how to tokenize/index/collate your dataset with `coll
 
 ```python
 import collatable
-from collatable import Instance, LabelField, MetadataField, TextField
+from collatable import LabelField, MetadataField, TextField
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 
 dataset = [
@@ -53,7 +53,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
         )
         metadata_field = MetadataField({"id": id_})
         # Combine these fields into instance
-        instance = Instance(
+        instance = dict(
             text=text_field,
             label=label_field,
             metadata=metadata_field,
@@ -85,7 +85,7 @@ Execution result:
 
 ```python
 import collatable
-from collatable import Instance, SequenceLabelField, TextField
+from collatable import SequenceLabelField, TextField
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 
 dataset = [
@@ -104,7 +104,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
     for tokens, labels in dataset:
         text_field = TextField(tokens, indexer=token_indexer, padding_value=token_indexer[PAD_TOKEN])
         label_field = SequenceLabelField(labels, text_field, indexer=label_indexer)
-        instance = Instance(text=text_field, label=label_field)
+        instance = dict(text=text_field, label=label_field)
         instances.append(instance)
 
 output = collatable.collate(instances)
@@ -128,7 +128,7 @@ Execution result:
 ```python
 import collatable
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
-from collatable import AdjacencyField, Instance, ListField, SpanField, TextField
+from collatable import AdjacencyField, ListField, SpanField, TextField
 
 PAD_TOKEN = "<PAD>"
 token_indexer = TokenIndexer[str](specials=(PAD_TOKEN,))
@@ -143,7 +143,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
     )
     spans = ListField([SpanField(0, 2, text), SpanField(5, 7, text), SpanField(11, 12, text)])
     relations = AdjacencyField([(0, 1), (0, 2)], spans, labels=["born-in", "lives-in"], indexer=label_indexer)
-    instance = Instance(text=text, spans=spans, relations=relations)
+    instance = dict(text=text, spans=spans, relations=relations)
     instances.append(instance)
 
     text = TextField(
@@ -153,7 +153,7 @@ with token_indexer.context(train=True), label_indexer.context(train=True):
     )
     spans = ListField([SpanField(0, 1, text), SpanField(5, 6, text)])
     relations = AdjacencyField([(0, 1)], spans, labels=["capital-of"], indexer=label_indexer)
-    instance = Instance(text=text, spans=spans, relations=relations)
+    instance = dict(text=text, spans=spans, relations=relations)
     instances.append(instance)
 
 output = collatable.collate(instances)
