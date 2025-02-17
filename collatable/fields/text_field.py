@@ -4,13 +4,13 @@ import numpy
 
 from collatable.fields.field import PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import T_DataArray
+from collatable.typing import DataArrayT
 
 Self = TypeVar("Self", bound="TextField")
 Token = TypeVar("Token")
 
 
-class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
+class TextField(Generic[Token, DataArrayT], SequenceField[DataArrayT]):
     __slots__ = ["_tokens", "_padding_value", "_indexed_tokens"]
 
     def __init__(
@@ -18,7 +18,7 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         tokens: Sequence[Token],
         *,
         vocab: Optional[Mapping[Token, int]] = None,
-        indexer: Optional[Callable[[Sequence[Token]], T_DataArray]] = None,
+        indexer: Optional[Callable[[Sequence[Token]], DataArrayT]] = None,
         padding_value: PaddingValue = 0,
     ) -> None:
         if (vocab is None is indexer) or (vocab is not None and indexer is not None):
@@ -31,7 +31,7 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         super().__init__(padding_value=padding_value)
 
         self._tokens = tokens
-        self._indexed_tokens: T_DataArray = indexer(self.tokens)
+        self._indexed_tokens: DataArrayT = indexer(self.tokens)
 
     def __len__(self) -> int:
         return len(self.tokens)
@@ -52,15 +52,15 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
     def tokens(self) -> Sequence[Token]:
         return self._tokens
 
-    def as_array(self) -> T_DataArray:
+    def as_array(self) -> DataArrayT:
         return self._indexed_tokens
 
     @staticmethod
-    def _make_indexer(vocab: Mapping[Token, int]) -> Callable[[Sequence[Token]], T_DataArray]:
-        def indexer(tokens: Sequence[Token]) -> T_DataArray:
+    def _make_indexer(vocab: Mapping[Token, int]) -> Callable[[Sequence[Token]], DataArrayT]:
+        def indexer(tokens: Sequence[Token]) -> DataArrayT:
             token_ids: numpy.ndarray = numpy.array([vocab[token] for token in tokens], dtype=numpy.int64)
             mask: numpy.ndarray = numpy.ones_like(token_ids, dtype=bool)
             output = {"token_ids": token_ids, "mask": mask}
-            return cast(T_DataArray, output)
+            return cast(DataArrayT, output)
 
         return indexer

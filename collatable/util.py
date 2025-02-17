@@ -2,19 +2,19 @@ from typing import Sequence, Type, cast
 
 import numpy
 
-from collatable.typing import ArrayLike, T_Scalar, T_Tensor
+from collatable.typing import ArrayLike, ScalarT, TensorT
 
 
 def stack_with_padding(
-    tensors: Sequence[T_Tensor],
+    tensors: Sequence[TensorT],
     padding_value: ArrayLike = 0,
-) -> T_Tensor:
+) -> TensorT:
     num_arrays = len(tensors)
     shapes = tuple(tensor.shape for tensor in tensors)
     max_shape = tuple(max(shape) for shape in zip(*shapes))
     if max_shape == ():
-        return cast(T_Tensor, numpy.array(tensors))
-    stacked = cast(T_Tensor, numpy.zeros((num_arrays, *max_shape), dtype=tensors[0].dtype))
+        return cast(TensorT, numpy.array(tensors))
+    stacked = cast(TensorT, numpy.zeros((num_arrays, *max_shape), dtype=tensors[0].dtype))
     for index, tensor in enumerate(tensors):
         stacked[index] = numpy.pad(
             tensor,
@@ -24,13 +24,13 @@ def stack_with_padding(
     return stacked
 
 
-def get_scalar_default_value(cls: Type[T_Scalar]) -> T_Scalar:
+def get_scalar_default_value(cls: Type[ScalarT]) -> ScalarT:
     if issubclass(cls, bool):
-        return cast(T_Scalar, False)
+        return cast(ScalarT, False)
     if issubclass(cls, int):
-        return cast(T_Scalar, 0)
+        return cast(ScalarT, 0)
     if issubclass(cls, float):
-        return cast(T_Scalar, 0.0)
+        return cast(ScalarT, 0.0)
     if issubclass(cls, complex):
-        return cast(T_Scalar, 0.0 + 0.0j)
+        return cast(ScalarT, 0.0 + 0.0j)
     raise TypeError(f"Unsupported type: {cls}")

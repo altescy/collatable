@@ -2,27 +2,27 @@ from typing import Generic, Iterator, Optional, Sequence
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import T_DataArray
+from collatable.typing import DataArrayT
 
 
-class ListField(Generic[T_DataArray], SequenceField[T_DataArray]):
+class ListField(Generic[DataArrayT], SequenceField[DataArrayT]):
     __slots__ = ["_fields", "_padding_value"]
 
     def __init__(
         self,
-        fields: Sequence[Field[T_DataArray]],
+        fields: Sequence[Field[DataArrayT]],
         padding_value: Optional[PaddingValue] = None,
     ) -> None:
         super().__init__(padding_value=padding_value if padding_value is not None else fields[0].padding_value)
-        self._fields: Sequence[Field[T_DataArray]] = fields
+        self._fields: Sequence[Field[DataArrayT]] = fields
 
     def __len__(self) -> int:
         return len(self.fields)
 
-    def __iter__(self) -> Iterator[Field[T_DataArray]]:
+    def __iter__(self) -> Iterator[Field[DataArrayT]]:
         return iter(self.fields)
 
-    def __getitem__(self, index: int) -> Field[T_DataArray]:
+    def __getitem__(self, index: int) -> Field[DataArrayT]:
         return self.fields[index]
 
     def __str__(self) -> str:
@@ -32,8 +32,8 @@ class ListField(Generic[T_DataArray], SequenceField[T_DataArray]):
         return f"ListField(fields={self._fields}, padding_value={self._padding_value})"
 
     @property
-    def fields(self) -> Sequence[Field[T_DataArray]]:
+    def fields(self) -> Sequence[Field[DataArrayT]]:
         return self._fields
 
-    def as_array(self) -> T_DataArray:
+    def as_array(self) -> DataArrayT:
         return self.fields[0].collate(self.fields)
