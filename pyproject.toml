@@ -13,7 +13,10 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-numpy = "^1.0.0"
+numpy = [
+    {version=">=1.26.4", python=">=3.9,<4.0"},
+    {version=">=1.0.0,<1.26.4", python=">=3.8,<3.9"},
+]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
