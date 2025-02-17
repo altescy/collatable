@@ -4,10 +4,10 @@ import numpy
 
 from collatable.fields.field import PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import Tensor
+from collatable.typing import IntTensor
 
 
-class SequenceLabelField(SequenceField[Tensor]):
+class SequenceLabelField(SequenceField[IntTensor]):
     __slots__ = ["_labels", "_indexed_labels"]
 
     def __init__(
@@ -57,7 +57,7 @@ class SequenceLabelField(SequenceField[Tensor]):
     def labels(self) -> Union[Sequence[int], Sequence[str]]:
         return self._labels
 
-    def as_array(self) -> Tensor:
+    def as_array(self) -> IntTensor:
         return numpy.array(self._indexed_labels)
 
     @staticmethod

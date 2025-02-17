@@ -4,12 +4,12 @@ import numpy
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import Tensor
+from collatable.typing import IntTensor
 
 Self = TypeVar("Self", bound="AdjacencyField")
 
 
-class AdjacencyField(Field[Tensor]):
+class AdjacencyField(Field[IntTensor]):
     __slots__ = ["_indices", "_labels", "_indexed_labels", "_sequence_length", "_padding_value"]
 
     def __init__(
@@ -61,8 +61,8 @@ class AdjacencyField(Field[Tensor]):
 
         return indexer
 
-    def as_array(self) -> Tensor:
-        array: numpy.ndarray = numpy.full(
+    def as_array(self) -> IntTensor:
+        array: IntTensor = numpy.full(
             (self._sequence_length, self._sequence_length),
             self.padding_value[""],
             dtype=numpy.int32,

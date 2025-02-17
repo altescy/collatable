@@ -2,10 +2,10 @@ import numpy
 
 from collatable.fields.field import Field
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import Tensor
+from collatable.typing import IntTensor
 
 
-class IndexField(Field[Tensor]):
+class IndexField(Field[IntTensor]):
     __slots__ = ["_index"]
 
     def __init__(self, index: int, sequence: SequenceField) -> None:
@@ -25,5 +25,5 @@ class IndexField(Field[Tensor]):
     def index(self) -> int:
         return self._index
 
-    def as_array(self) -> Tensor:
+    def as_array(self) -> IntTensor:
         return numpy.array(self.index)

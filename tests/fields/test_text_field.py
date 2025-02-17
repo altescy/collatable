@@ -1,13 +1,12 @@
-from typing import Dict, List
+from typing import List
 
 from collatable.fields.text_field import PaddingValue, TextField
-from collatable.typing import Tensor
 
 
 def test_text_field_can_be_converted_to_array() -> None:
     tokens = ["this", "is", "a", "test"]
     vocab = {"a": 0, "is": 1, "test": 2, "this": 3}
-    field = TextField[str, Dict[str, Tensor]](tokens, vocab=vocab)
+    field = TextField(tokens, vocab=vocab)
     output = field.as_array()
     assert isinstance(output, dict)
     assert output.keys() == {"token_ids", "mask"}
@@ -18,7 +17,7 @@ def test_text_field_can_be_converted_to_array() -> None:
 def test_text_field_can_be_collated() -> None:
     vocab = {"a": 0, "first": 1, "is": 2, "this": 3, "second": 4, "sentence": 5, "!": 6}
     padding_value: PaddingValue = {"token_ids": -1}
-    fields: List[TextField[str, Dict[str, Tensor]]] = [
+    fields: List[TextField] = [
         TextField(["this", "is", "a", "first", "sentence"], vocab=vocab, padding_value=padding_value),
         TextField(["this", "is", "a", "second", "sentence", "!"], vocab=vocab, padding_value=padding_value),
     ]

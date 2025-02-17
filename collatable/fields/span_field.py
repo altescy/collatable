@@ -2,10 +2,10 @@ import numpy
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import Tensor
+from collatable.typing import IntTensor
 
 
-class SpanField(Field[Tensor]):
+class SpanField(Field[IntTensor]):
     __slots__ = ["_span_start", "_span_end", "_padding_value"]
 
     def __init__(
@@ -43,5 +43,5 @@ class SpanField(Field[Tensor]):
     def span_end(self) -> int:
         return self._span_end
 
-    def as_array(self) -> Tensor:
+    def as_array(self) -> IntTensor:
         return numpy.array([self.span_start, self.span_end])
