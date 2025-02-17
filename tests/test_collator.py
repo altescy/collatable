@@ -5,7 +5,6 @@ import numpy
 from collatable.collator import Collator
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 from collatable.fields import LabelField, MetadataField, TextField
-from collatable.instance import Instance
 
 
 def test_instance() -> None:
@@ -19,11 +18,11 @@ def test_instance() -> None:
     token_indexer = TokenIndexer[str]()
     label_indexer = LabelIndexer[str]()
 
-    instances: List[Instance] = []
+    instances: List[dict] = []
     with token_indexer.context(train=True), label_indexer.context(train=True):
         for id_, (text, label) in enumerate(dataset):
             tokens = text.split()
-            instance = Instance(
+            instance = dict(
                 text=TextField(tokens, indexer=token_indexer),
                 label=LabelField(label, indexer=label_indexer),
                 metadata=MetadataField({"id": id_}),

@@ -1,26 +1,27 @@
 import math
 import random
-from typing import Dict, Iterator, Sequence
+from typing import Dict, Iterator, Mapping, Optional, Sequence
 
 from collatable.collator import Collator
-from collatable.instance import Instance
+from collatable.fields import Field
 from collatable.typing import DataArray
 
 
 class BatchIterator:
     def __init__(
         self,
-        dataset: Sequence[Instance],
+        dataset: Sequence[Mapping[str, Field]],
         batch_size: int = 1,
         shuffle: bool = False,
         drop_last: bool = False,
+        collator: Optional[Collator] = None,
     ) -> None:
         self._dataset = dataset
         self._batch_size = batch_size
         self._shuffle = shuffle
         self._drop_last = drop_last
         self._offset = 0
-        self._collator = Collator()
+        self._collator = collator or Collator()
         self._indices = list(range(len(self._dataset)))
         if self._shuffle:
             random.shuffle(self._indices)
@@ -48,20 +49,18 @@ class BatchIterator:
 
 class DataLoader:
     def __init__(
-        self,
-        batch_size: int = 1,
-        shuffle: bool = False,
-        drop_last: bool = False,
+        self, batch_size: int = 1, shuffle: bool = False, drop_last: bool = False, collator: Optional[Collator] = None
     ) -> None:
         self._batch_size = batch_size
         self._shuffle = shuffle
         self._drop_last = drop_last
-        self._collator = Collator()
+        self._collator = collator or Collator()
 
-    def __call__(self, dataset: Sequence[Instance]) -> BatchIterator:
+    def __call__(self, dataset: Sequence[Mapping[str, Field]]) -> BatchIterator:
         return BatchIterator(
             dataset,
             batch_size=self._batch_size,
             shuffle=self._shuffle,
             drop_last=self._drop_last,
+            collator=self._collator,
         )

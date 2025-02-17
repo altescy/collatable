@@ -15,7 +15,6 @@ from collatable.fields import (  # noqa: F401
     TensorField,
     TextField,
 )
-from collatable.instance import Instance  # noqa: F401
 
 __version__ = version("collatable")
 __all__ = [
@@ -30,6 +29,5 @@ __all__ = [
     "SpanField",
     "TensorField",
     "TextField",
-    "Instance",
     "collate",
 ]
