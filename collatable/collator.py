@@ -12,7 +12,15 @@ class Collator:
         if not isinstance(instance, Mapping):
             if hasattr(instance, "__dict__"):
                 members = instance.__dict__
-                slots = getattr(instance, "__slots__", [key for key in members if not key.startswith("_")])
+                slots = set(
+                    getattr(
+                        instance,
+                        "__slots__",
+                        [key for key in members if not key.startswith("_") or key in (self._field_names or [])],
+                    )
+                )
+                if self._field_names is not None and not (self._field_names <= slots):
+                    raise ValueError(f"Field names {self._field_names - slots} not found")
                 instance = {slot: members[slot] for slot in slots if slot in members}
             elif isinstance(instance, INamedTuple):
                 instance = instance._asdict()
