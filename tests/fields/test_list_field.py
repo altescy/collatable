@@ -9,7 +9,7 @@ def test_list_field_can_convert_scalara_fields_to_array() -> None:
     field = ListField([ScalarField(value) for value in range(5)])
     output = field.as_array()
     assert isinstance(output, numpy.ndarray)
-    assert output.shape == (5,)
+    assert output.shape == (5,)  # type: ignore[comparison-overlap]
 
 
 def test_list_field_can_convert_tensor_fields_to_array() -> None:
@@ -21,7 +21,7 @@ def test_list_field_can_convert_tensor_fields_to_array() -> None:
     )
     output = field.as_array()
     assert isinstance(output, numpy.ndarray)
-    assert output.shape == (2, 3, 4)
+    assert output.shape == (2, 3, 4)  # type: ignore[comparison-overlap]
     numpy.testing.assert_array_equal(output[0, :2, :3], numpy.zeros((2, 3)))
     numpy.testing.assert_array_equal(output[1, :3, :4], numpy.ones((3, 4)))
 

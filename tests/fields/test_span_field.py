@@ -27,7 +27,7 @@ def test_span_field() -> None:
     output = fields[0].collate(fields)
 
     assert isinstance(output, numpy.ndarray)
-    assert output.shape == (2, 3, 2)
+    assert output.shape == (2, 3, 2)  # type:ignore[comparison-overlap]
 
     span_lengths = (output.max(2) >= 0).sum(1)
     assert span_lengths.tolist() == [3, 2]
