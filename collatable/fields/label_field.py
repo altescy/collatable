@@ -3,12 +3,12 @@ from typing import Callable, Mapping, Optional, TypeVar, Union
 import numpy
 
 from collatable.fields.field import Field
-from collatable.typing import Tensor
+from collatable.typing import IntTensor
 
 Self = TypeVar("Self", bound="LabelField")
 
 
-class LabelField(Field[Tensor]):
+class LabelField(Field[IntTensor]):
     __slots__ = ["_label", "_label_index"]
 
     def __init__(
@@ -45,7 +45,7 @@ class LabelField(Field[Tensor]):
     def label(self) -> Union[int, str]:
         return self._label
 
-    def as_array(self) -> Tensor:
+    def as_array(self) -> IntTensor:
         return numpy.array(self._label_index, dtype=numpy.int32)
 
     @staticmethod

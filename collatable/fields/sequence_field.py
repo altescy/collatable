@@ -1,11 +1,11 @@
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 from collatable.fields.field import Field
-from collatable.typing import T_DataArray
+from collatable.typing import DataArrayT
 
 Self = TypeVar("Self", bound="SequenceField")
 
 
-class SequenceField(Field[T_DataArray]):
+class SequenceField(Generic[DataArrayT], Field[DataArrayT]):
     def __len__(self) -> int:
         raise NotImplementedError

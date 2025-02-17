@@ -19,19 +19,19 @@ import numpy
 
 from collatable.typing import Tensor
 
-T_Value = TypeVar("T_Value", bound=Hashable)
+ValueT = TypeVar("ValueT", bound=Hashable)
 Self = TypeVar("Self", bound="Indexer")
 
 
-class Indexer(Generic[T_Value]):
+class Indexer(Generic[ValueT]):
     def __init__(
         self,
         *,
-        ignores: Iterable[T_Value] = (),
-        specials: Sequence[T_Value] = (),
-        bos: Optional[T_Value] = None,
-        eos: Optional[T_Value] = None,
-        default: Optional[T_Value] = None,
+        ignores: Iterable[ValueT] = (),
+        specials: Sequence[ValueT] = (),
+        bos: Optional[ValueT] = None,
+        eos: Optional[ValueT] = None,
+        default: Optional[ValueT] = None,
     ) -> None:
         if bos is not None and bos not in specials:
             raise ValueError("bos value must be in specials")
@@ -40,9 +40,9 @@ class Indexer(Generic[T_Value]):
         if default is not None and default not in specials:
             raise ValueError("default value must be in specials")
 
-        self._index_to_value: List[T_Value] = list(specials)
-        self._value_to_index: Dict[T_Value, int] = {value: index for index, value in enumerate(specials)}
-        self._ignores: Set[T_Value] = set(ignores)
+        self._index_to_value: List[ValueT] = list(specials)
+        self._value_to_index: Dict[ValueT, int] = {value: index for index, value in enumerate(specials)}
+        self._ignores: Set[ValueT] = set(ignores)
         self._bos_value = bos
         self._eos_value = eos
         self._default_value = default
@@ -51,7 +51,7 @@ class Indexer(Generic[T_Value]):
     def __len__(self) -> int:
         return len(self._index_to_value)
 
-    def __getitem__(self, value: T_Value) -> int:
+    def __getitem__(self, value: ValueT) -> int:
         return self.get_index_by_value(value)
 
     @property
@@ -77,10 +77,10 @@ class Indexer(Generic[T_Value]):
         finally:
             self._training = prev_training
 
-    def get_value_by_index(self, index: int) -> T_Value:
+    def get_value_by_index(self, index: int) -> ValueT:
         return self._index_to_value[index]
 
-    def get_index_by_value(self, value: T_Value) -> int:
+    def get_index_by_value(self, value: ValueT) -> int:
         if self._default_value is not None and value in self._ignores:
             return self._value_to_index[self._default_value]
         if value not in self._value_to_index:
@@ -95,14 +95,14 @@ class Indexer(Generic[T_Value]):
     @classmethod
     def from_iterable(
         cls,
-        iterable: Iterable[T_Value],
+        iterable: Iterable[ValueT],
         *,
-        ignores: Iterable[T_Value] = (),
-        specials: Sequence[T_Value] = (),
-        bos: Optional[T_Value] = None,
-        eos: Optional[T_Value] = None,
-        default: Optional[T_Value] = None,
-    ) -> "Indexer[T_Value]":
+        ignores: Iterable[ValueT] = (),
+        specials: Sequence[ValueT] = (),
+        bos: Optional[ValueT] = None,
+        eos: Optional[ValueT] = None,
+        default: Optional[ValueT] = None,
+    ) -> "Indexer[ValueT]":
         indexer = cls(ignores=ignores, specials=specials, bos=bos, eos=eos, default=default)
         with indexer.context(train=True):
             for value in iterable:
@@ -110,14 +110,14 @@ class Indexer(Generic[T_Value]):
         return indexer
 
     @classmethod
-    def from_vocab(cls, vocab: Mapping[T_Value, int]) -> "Indexer[T_Value]":
+    def from_vocab(cls, vocab: Mapping[ValueT, int]) -> "Indexer[ValueT]":
         class PlaceHolder: ...
 
         placeholder = PlaceHolder()
 
-        indexer: Indexer[T_Value] = cls()
-        index_to_value: List[Union[T_Value, PlaceHolder]] = [placeholder] * len(vocab)
-        value_to_index: Dict[T_Value, int] = {}
+        indexer: Indexer[ValueT] = cls()
+        index_to_value: List[Union[ValueT, PlaceHolder]] = [placeholder] * len(vocab)
+        value_to_index: Dict[ValueT, int] = {}
         for value, index in vocab.items():
             if index < 0:
                 raise ValueError("index must be non-negative")
@@ -128,25 +128,25 @@ class Indexer(Generic[T_Value]):
             index_to_value[index] = value
             value_to_index[value] = index
 
-        indexer._index_to_value = cast(List[T_Value], index_to_value)
+        indexer._index_to_value = cast(List[ValueT], index_to_value)
         indexer._value_to_index = value_to_index
         return indexer
 
     @classmethod
     def from_documents(
         cls,
-        documents: Iterable[Sequence[T_Value]],
+        documents: Iterable[Sequence[ValueT]],
         *,
         min_df: Union[int, float] = 1,
         max_df: Union[int, float] = 1.0,
-        ignores: Iterable[T_Value] = (),
-        specials: Sequence[T_Value] = (),
-        bos: Optional[T_Value] = None,
-        eos: Optional[T_Value] = None,
-        default: Optional[T_Value] = None,
-    ) -> "Indexer[T_Value]":
+        ignores: Iterable[ValueT] = (),
+        specials: Sequence[ValueT] = (),
+        bos: Optional[ValueT] = None,
+        eos: Optional[ValueT] = None,
+        default: Optional[ValueT] = None,
+    ) -> "Indexer[ValueT]":
         num_documents = 0
-        value_to_df: Dict[T_Value, int] = {}
+        value_to_df: Dict[ValueT, int] = {}
         for tokens in documents:
             num_documents += 1
             for token in set(tokens):
@@ -164,8 +164,8 @@ class Indexer(Generic[T_Value]):
         return indexer
 
 
-class TokenIndexer(Indexer[T_Value]):
-    def __call__(self, tokens: Sequence[T_Value]) -> Dict[str, Tensor]:
+class TokenIndexer(Generic[ValueT], Indexer[ValueT]):
+    def __call__(self, tokens: Sequence[ValueT]) -> Dict[str, Tensor]:
         token_ids = [self.get_index_by_value(value) for value in tokens]
         if self._bos_value is not None:
             token_ids = [self._value_to_index[self._bos_value]] + token_ids
@@ -174,6 +174,6 @@ class TokenIndexer(Indexer[T_Value]):
         return {"token_ids": numpy.array(token_ids, dtype=numpy.int64), "mask": numpy.ones(len(token_ids), dtype=bool)}
 
 
-class LabelIndexer(Indexer[T_Value]):
-    def __call__(self, label: T_Value) -> int:
+class LabelIndexer(Generic[ValueT], Indexer[ValueT]):
+    def __call__(self, label: ValueT) -> int:
         return self.get_index_by_value(label)

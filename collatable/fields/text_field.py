@@ -1,24 +1,23 @@
-from typing import Callable, Generic, Iterator, Mapping, Optional, Sequence, TypeVar, cast
+from typing import Callable, Generic, Hashable, Iterator, Mapping, Optional, Sequence, TypeVar
 
 import numpy
 
 from collatable.fields.field import PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import T_DataArray
 
 Self = TypeVar("Self", bound="TextField")
-Token = TypeVar("Token")
+TokenT = TypeVar("TokenT", bound=Hashable)
 
 
-class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
+class TextField(Generic[TokenT], SequenceField[Mapping[str, numpy.ndarray]]):
     __slots__ = ["_tokens", "_padding_value", "_indexed_tokens"]
 
     def __init__(
         self,
-        tokens: Sequence[Token],
+        tokens: Sequence[TokenT],
         *,
-        vocab: Optional[Mapping[Token, int]] = None,
-        indexer: Optional[Callable[[Sequence[Token]], T_DataArray]] = None,
+        vocab: Optional[Mapping[TokenT, int]] = None,
+        indexer: Optional[Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]] = None,
         padding_value: PaddingValue = 0,
     ) -> None:
         if (vocab is None is indexer) or (vocab is not None and indexer is not None):
@@ -31,15 +30,15 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         super().__init__(padding_value=padding_value)
 
         self._tokens = tokens
-        self._indexed_tokens: T_DataArray = indexer(self.tokens)
+        self._indexed_tokens = indexer(self.tokens)
 
     def __len__(self) -> int:
         return len(self.tokens)
 
-    def __iter__(self) -> Iterator[Token]:
+    def __iter__(self) -> Iterator[TokenT]:
         return iter(self.tokens)
 
-    def __getitem__(self, index: int) -> Token:
+    def __getitem__(self, index: int) -> TokenT:
         return self.tokens[index]
 
     def __str__(self) -> str:
@@ -49,18 +48,18 @@ class TextField(Generic[Token, T_DataArray], SequenceField[T_DataArray]):
         return f"TextField(tokens={self.tokens}, padding_value={self._padding_value})"
 
     @property
-    def tokens(self) -> Sequence[Token]:
+    def tokens(self) -> Sequence[TokenT]:
         return self._tokens
 
-    def as_array(self) -> T_DataArray:
+    def as_array(self) -> Mapping[str, numpy.ndarray]:
         return self._indexed_tokens
 
     @staticmethod
-    def _make_indexer(vocab: Mapping[Token, int]) -> Callable[[Sequence[Token]], T_DataArray]:
-        def indexer(tokens: Sequence[Token]) -> T_DataArray:
+    def _make_indexer(vocab: Mapping[TokenT, int]) -> Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]:
+        def indexer(tokens: Sequence[TokenT]) -> Mapping[str, numpy.ndarray]:
             token_ids: numpy.ndarray = numpy.array([vocab[token] for token in tokens], dtype=numpy.int64)
             mask: numpy.ndarray = numpy.ones_like(token_ids, dtype=bool)
             output = {"token_ids": token_ids, "mask": mask}
-            return cast(T_DataArray, output)
+            return output
 
         return indexer

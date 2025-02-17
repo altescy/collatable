@@ -1,24 +1,24 @@
-from typing import cast
+from typing import Generic, cast
 
 import numpy
 
 from collatable.fields.field import Field
-from collatable.typing import ArrayLike, Tensor
+from collatable.typing import ArrayLike, TensorT
 
 
-class TensorField(Field[Tensor]):
+class TensorField(Generic[TensorT], Field[TensorT]):
     __slots__ = ["_tensor", "_padding_value"]
 
     def __init__(
         self,
-        tensor: Tensor,
+        tensor: TensorT,
         padding_value: ArrayLike = 0,
     ) -> None:
         super().__init__(padding_value=padding_value)
         self._tensor = tensor
 
     @property
-    def tensor(self) -> Tensor:
+    def tensor(self) -> TensorT:
         return self._tensor
 
     def __eq__(self, other: object) -> bool:
@@ -33,5 +33,5 @@ class TensorField(Field[Tensor]):
     def __repr__(self) -> str:
         return f"TensorField(tensor={self._tensor}, padding_value={self._padding_value})"
 
-    def as_array(self) -> Tensor:
+    def as_array(self) -> TensorT:
         return self._tensor

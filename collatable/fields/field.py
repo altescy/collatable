@@ -4,14 +4,14 @@ from typing import Dict, Generic, List, Sequence, TypeVar, Union, cast
 
 import numpy
 
-from collatable.typing import ArrayLike, T_DataArray
+from collatable.typing import ArrayLike, DataArrayT_co
 from collatable.util import stack_with_padding
 
 Self = TypeVar("Self", bound="Field")
 PaddingValue = Union[Dict[str, ArrayLike], ArrayLike]
 
 
-class Field(abc.ABC, Generic[T_DataArray]):
+class Field(abc.ABC, Generic[DataArrayT_co]):
     __slots__: List[str]
 
     def __init__(self, padding_value: PaddingValue = 0) -> None:
@@ -35,14 +35,17 @@ class Field(abc.ABC, Generic[T_DataArray]):
     def padding_value(self) -> Dict[str, ArrayLike]:
         return self._padding_value
 
-    def collate(self: Self, arrays: Union[Sequence[T_DataArray], Sequence[Self]]) -> T_DataArray:
+    def collate(self: Self, arrays: Union[Sequence[DataArrayT_co], Sequence[Self]]) -> DataArrayT_co:
         if isinstance(arrays[0], Field):
             arrays = [cast(Self, array).as_array() for array in arrays]
-        arrays = cast(Sequence[T_DataArray], arrays)
+        arrays = cast(Sequence[DataArrayT_co], arrays)
         if isinstance(arrays[0], numpy.ndarray):
-            return stack_with_padding(arrays, padding_value=self.padding_value[""])
+            return cast(
+                DataArrayT_co,
+                stack_with_padding(cast(Sequence[numpy.ndarray], arrays), padding_value=self.padding_value[""]),
+            )
         if isinstance(arrays[0], list):
-            return list(arrays)
+            return cast(DataArrayT_co, list(arrays))
         if isinstance(arrays[0], dict):
             return {
                 key: stack_with_padding(
@@ -57,5 +60,5 @@ class Field(abc.ABC, Generic[T_DataArray]):
         return copy.deepcopy(self)
 
     @abc.abstractmethod
-    def as_array(self) -> T_DataArray:
+    def as_array(self) -> DataArrayT_co:
         raise NotImplementedError
