@@ -25,12 +25,12 @@ def stack_with_padding(
 
 
 def get_scalar_default_value(cls: Type[T_Scalar]) -> T_Scalar:
+    if issubclass(cls, bool):
+        return cast(T_Scalar, False)
     if issubclass(cls, int):
         return cast(T_Scalar, 0)
     if issubclass(cls, float):
         return cast(T_Scalar, 0.0)
     if issubclass(cls, complex):
         return cast(T_Scalar, 0.0 + 0.0j)
-    if issubclass(cls, bool):
-        return cast(T_Scalar, False)
     raise TypeError(f"Unsupported type: {cls}")
