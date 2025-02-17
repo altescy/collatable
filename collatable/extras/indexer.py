@@ -111,8 +111,7 @@ class Indexer(Generic[T_Value]):
 
     @classmethod
     def from_vocab(cls, vocab: Mapping[T_Value, int]) -> "Indexer[T_Value]":
-        class PlaceHolder:
-            ...
+        class PlaceHolder: ...
 
         placeholder = PlaceHolder()
 

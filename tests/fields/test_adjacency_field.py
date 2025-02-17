@@ -38,7 +38,7 @@ def test_adajacency_field() -> None:
 
     output = collate(instances)["relations"]
     assert isinstance(output, numpy.ndarray)
-    assert output.shape == (2, 3, 3)
+    assert output.shape == (2, 3, 3)  # type: ignore[comparison-overlap]
 
     relation_counts = (output >= 0).sum(2).sum(1)
     assert relation_counts.tolist() == [2, 1]

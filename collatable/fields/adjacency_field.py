@@ -62,7 +62,7 @@ class AdjacencyField(Field[Tensor]):
         return indexer
 
     def as_array(self) -> Tensor:
-        array = numpy.full(
+        array: numpy.ndarray = numpy.full(
             (self._sequence_length, self._sequence_length),
             self.padding_value[""],
             dtype=numpy.int32,

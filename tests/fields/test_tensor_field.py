@@ -10,7 +10,7 @@ def test_tensor_field() -> None:
     ]
     output = fields[0].collate(fields)
     assert isinstance(output, numpy.ndarray)
-    assert output.shape == (2, 3, 4)
+    assert output.shape == (2, 3, 4)  # type: ignore[comparison-overlap]
     assert output.sum() == 6
     numpy.testing.assert_array_equal(output[0, :2, :3], numpy.zeros((2, 3)))
     numpy.testing.assert_array_equal(output[1, :3, :4], numpy.ones((3, 4)))
