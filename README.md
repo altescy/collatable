@@ -224,9 +224,8 @@ with shared_token_indexer.context(train=True):
 
 text2text_instances = list(text2text_datamodule(text2text_dataset))
 
-
 dataloader = DataLoader(batch_size=2)
-for batch in dataloader(list(text2text_datamodule(text2text_dataset))):
+for batch in dataloader(text2text_instances):
     print(batch)
 ```
 
