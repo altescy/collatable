@@ -237,19 +237,19 @@ Execution result:
     'token_ids': array([[12, 13,  0,  0],
                         [14,  8,  6, 15]]),
     'mask': array([[ True,  True, False, False],
-       			   [ True,  True,  True,  True]])},
+                   [ True,  True,  True,  True]])},
  'source': {
-	'token_ids': array([[2, 3, 4, 0],
+    'token_ids': array([[2, 3, 4, 0],
                         [5, 6, 7, 8]]),
-	'mask': array([[ True,  True,  True, False],
+    'mask': array([[ True,  True,  True, False],
                    [ True,  True,  True,  True]])}}
 {'target': {
-	'token_ids': array([[12, 16, 17, 18,  0],
-     			g[19,  6, 20, 21, 22]]),
+    'token_ids': array([[12, 16, 17, 18,  0],
+                        [19,  6, 20, 21, 22]]),
     'mask': array([[ True,  True,  True,  True, False],
-	g       [ True,  True,  True,  True,  True]])},
+                   [ True,  True,  True,  True,  True]])},
  'source': {'token_ids': array([[ 9,  3,  4,  0],
-       				g    [ 5,  6, 10, 11]]),
+                                [ 5,  6, 10, 11]]),
             'mask': array([[ True,  True,  True, False],
                            [ True,  True,  True,  True]])}}
 ```
