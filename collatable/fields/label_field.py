@@ -1,4 +1,4 @@
-from typing import Callable, Mapping, Optional, TypeVar, Union
+from typing import Callable, Generic, Hashable, Mapping, Optional, TypeVar
 
 import numpy
 
@@ -6,17 +6,18 @@ from collatable.fields.field import Field
 from collatable.typing import IntTensor
 
 Self = TypeVar("Self", bound="LabelField")
+LabelT = TypeVar("LabelT", bound=Hashable)
 
 
-class LabelField(Field[IntTensor]):
+class LabelField(Generic[LabelT], Field[IntTensor]):
     __slots__ = ["_label", "_label_index"]
 
     def __init__(
         self,
-        label: Union[int, str],
+        label: LabelT,
         *,
-        vocab: Optional[Mapping[str, int]] = None,
-        indexer: Optional[Callable[[str], int]] = None,
+        vocab: Optional[Mapping[LabelT, int]] = None,
+        indexer: Optional[Callable[[LabelT], int]] = None,
     ) -> None:
         if isinstance(label, str) and vocab is None is indexer:
             raise ValueError("LabelField with string labels requires vocab or indexer")
@@ -42,15 +43,15 @@ class LabelField(Field[IntTensor]):
         return f"LabelField(label={self._label})"
 
     @property
-    def label(self) -> Union[int, str]:
+    def label(self) -> LabelT:
         return self._label
 
     def as_array(self) -> IntTensor:
         return numpy.array(self._label_index, dtype=numpy.int32)
 
     @staticmethod
-    def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:
-        def indexer(label: str) -> int:
+    def _make_indexer(vocab: Mapping[LabelT, int]) -> Callable[[LabelT], int]:
+        def indexer(label: LabelT) -> int:
             return vocab[label]
 
         return indexer
