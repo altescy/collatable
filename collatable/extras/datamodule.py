@@ -46,11 +46,13 @@ class ISequenceIndexer(Protocol[HashableT_contra, IndexT_co]):
 
 
 class FieldAccessor:
-    def __init__(self, name: str) -> None:
-        self._name = name
+    def __init__(self, field: str) -> None:
+        self._field = field.split(".")
 
     def __call__(self, obj: Any) -> Any:
-        return getattr(obj, self._name)
+        for part in self._field:
+            obj = obj[part] if isinstance(obj, Mapping) else getattr(obj, part)
+        return obj
 
 
 class FieldTransform(Generic[S]):
