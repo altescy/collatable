@@ -181,3 +181,75 @@ Execution result:
                       [-1, -1, -1],
                       [-1, -1, -1]]], dtype=int32)}
 ```
+
+
+### DataModule
+
+```python
+from dataclasses import dataclass
+from typing import Sequence, Union
+
+from collatable import LabelField, TextField
+from collatable.extras import DataLoader, LabelIndexer, TokenIndexer
+from collatable.extras.datamodule import DataModule, LabelFieldTransform, TextFieldTransform
+
+
+@dataclass
+class Text2TextExample:
+    source: Union[str, Sequence[str]]
+    target: Union[str, Sequence[str]]
+
+
+text2text_dataset = [
+    Text2TextExample(source="how are you?", target="I am fine."),
+    Text2TextExample(source="what is your name?", target="My name is John."),
+    Text2TextExample(source="where are you?", target="I am in New York."),
+    Text2TextExample(source="what is the time?", target="It is 10:00 AM."),
+]
+
+shared_token_indexer = TokenIndexer(
+    default="<unk>",
+    specials=["<pad>", "<unk>"],
+)
+
+text2text_datamodule = DataModule[Text2TextExample](
+    fields={
+        "source": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
+        "target": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
+    }
+)
+
+with shared_token_indexer.context(train=True):
+    text2text_datamodule.build(text2text_dataset)
+
+text2text_instances = list(text2text_datamodule(text2text_dataset))
+
+
+dataloader = DataLoader(batch_size=2)
+for batch in dataloader(list(text2text_datamodule(text2text_dataset))):
+    print(batch)
+```
+
+Execution result:
+
+```
+{'target': {
+    'token_ids': array([[12, 13,  0,  0],
+                        [14,  8,  6, 15]]),
+    'mask': array([[ True,  True, False, False],
+       			   [ True,  True,  True,  True]])},
+ 'source': {
+	'token_ids': array([[2, 3, 4, 0],
+                        [5, 6, 7, 8]]),
+	'mask': array([[ True,  True,  True, False],
+                   [ True,  True,  True,  True]])}}
+{'target': {
+	'token_ids': array([[12, 16, 17, 18,  0],
+     			g[19,  6, 20, 21, 22]]),
+    'mask': array([[ True,  True,  True,  True, False],
+	g       [ True,  True,  True,  True,  True]])},
+ 'source': {'token_ids': array([[ 9,  3,  4,  0],
+       				g    [ 5,  6, 10, 11]]),
+            'mask': array([[ True,  True,  True, False],
+                           [ True,  True,  True,  True]])}}
+```
