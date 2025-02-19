@@ -183,72 +183,83 @@ Execution result:
 ```
 
 
-### DataModule
+### Rererence Implementation
+
+`extra` module provides a reference implementation to use `collatable` effectively.
+Here is an example of text-to-text task that encodes raw texts/labels into token
+ids and decodes them back to raw texts/labels:
 
 ```python
 from dataclasses import dataclass
-from typing import Sequence, Union
+from typing import Mapping, Sequence, Union
 
 from collatable import LabelField, TextField
-from collatable.extras import DataLoader, LabelIndexer, TokenIndexer
+from collatable.extras import DataLoader, Dataset, DefaultBatchSampler, LabelIndexer, TokenIndexer
 from collatable.extras.datamodule import DataModule, LabelFieldTransform, TextFieldTransform
+from collatable.util import debatched
 
 
 @dataclass
 class Text2TextExample:
     source: Union[str, Sequence[str]]
     target: Union[str, Sequence[str]]
+    language: str
 
 
 text2text_dataset = [
-    Text2TextExample(source="how are you?", target="I am fine."),
-    Text2TextExample(source="what is your name?", target="My name is John."),
-    Text2TextExample(source="where are you?", target="I am in New York."),
-    Text2TextExample(source="what is the time?", target="It is 10:00 AM."),
+    Text2TextExample(source="how are you?", target="I am fine.", language="en"),
+    Text2TextExample(source="what is your name?", target="My name is John.", language="en"),
+    Text2TextExample(source="where are you?", target="I am in New-York.", language="en"),
+    Text2TextExample(source="what is the time?", target="It is 10:00 AM.", language="en"),
+    Text2TextExample(source="comment ça va?", target="Je vais bien.", language="fr"),
 ]
 
-shared_token_indexer = TokenIndexer(
-    default="<unk>",
-    specials=["<pad>", "<unk>"],
-)
+shared_token_indexer = TokenIndexer(default="<unk>", specials=["<pad>", "<unk>"])
+language_indexer = LabelIndexer[str]()
 
 text2text_datamodule = DataModule[Text2TextExample](
     fields={
         "source": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
         "target": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
+        "language": LabelFieldTransform(indexer=language_indexer),
     }
 )
 
-with shared_token_indexer.context(train=True):
+with shared_token_indexer.context(train=True), language_indexer.context(train=True):
     text2text_datamodule.build(text2text_dataset)
 
-text2text_instances = list(text2text_datamodule(text2text_dataset))
 
-dataloader = DataLoader(batch_size=2)
+dataloader = DataLoader(DefaultBatchSampler(batch_size=2))
+
+text2text_instances = Dataset.from_iterable(text2text_datamodule(text2text_dataset))
+
 for batch in dataloader(text2text_instances):
+    print("Batch:")
     print(batch)
+    print("Reconstruction:")
+    for item in debatched(batch):
+        print(text2text_datamodule.reconstruct(item))
+    print()
 ```
 
 Execution result:
 
-```
+```text
+Batch:
 {'target': {
-    'token_ids': array([[12, 13,  0,  0],
-                        [14,  8,  6, 15]]),
-    'mask': array([[ True,  True, False, False],
-                   [ True,  True,  True,  True]])},
- 'source': {
-    'token_ids': array([[2, 3, 4, 0],
-                        [5, 6, 7, 8]]),
-    'mask': array([[ True,  True,  True, False],
-                   [ True,  True,  True,  True]])}}
-{'target': {
-    'token_ids': array([[12, 16, 17, 18,  0],
-                        [19,  6, 20, 21, 22]]),
+    'token_ids': array([[16, 17, 18, 19,  0],
+                        [20,  9,  7, 21, 19]]),
     'mask': array([[ True,  True,  True,  True, False],
                    [ True,  True,  True,  True,  True]])},
- 'source': {'token_ids': array([[ 9,  3,  4,  0],
-                                [ 5,  6, 10, 11]]),
-            'mask': array([[ True,  True,  True, False],
-                           [ True,  True,  True,  True]])}}
+    'language': array([0, 0], dtype=int32),
+ 'source': {
+    'token_ids': array([[2, 3, 4, 5, 0],
+                        [6, 7, 8, 9, 5]]),
+    'mask': array([[ True,  True,  True,  True, False],
+                   [ True,  True,  True,  True,  True]])}}
+Reconstruction:
+{'source': ['how', 'are', 'you', '?'], 'target': ['I', 'am', 'fine', '.'], 'language': 'en'}
+{'source': ['what', 'is', 'your', 'name', '?'], 'target': ['My', 'name', 'is', 'John', '.'], 'language': 'en'}
+
+...
 ```

@@ -1,17 +1,17 @@
 import abc
 import copy
-from typing import Dict, Generic, List, Sequence, TypeVar, Union, cast
+from typing import Any, Dict, Generic, List, Sequence, Type, TypeVar, Union, cast
 
 import numpy
 
-from collatable.typing import ArrayLike, DataArrayT_co
+from collatable.typing import ArrayLike, DataArrayT
 from collatable.util import stack_with_padding
 
 Self = TypeVar("Self", bound="Field")
 PaddingValue = Union[Dict[str, ArrayLike], ArrayLike]
 
 
-class Field(abc.ABC, Generic[DataArrayT_co]):
+class Field(abc.ABC, Generic[DataArrayT]):
     __slots__: List[str]
 
     def __init__(self, padding_value: PaddingValue = 0) -> None:
@@ -35,17 +35,17 @@ class Field(abc.ABC, Generic[DataArrayT_co]):
     def padding_value(self) -> Dict[str, ArrayLike]:
         return self._padding_value
 
-    def collate(self: Self, arrays: Union[Sequence[DataArrayT_co], Sequence[Self]]) -> DataArrayT_co:
+    def collate(self: Self, arrays: Union[Sequence[DataArrayT], Sequence[Self]]) -> DataArrayT:
         if isinstance(arrays[0], Field):
             arrays = [cast(Self, array).as_array() for array in arrays]
-        arrays = cast(Sequence[DataArrayT_co], arrays)
+        arrays = cast(Sequence[DataArrayT], arrays)
         if isinstance(arrays[0], numpy.ndarray):
             return cast(
-                DataArrayT_co,
+                DataArrayT,
                 stack_with_padding(cast(Sequence[numpy.ndarray], arrays), padding_value=self.padding_value[""]),
             )
         if isinstance(arrays[0], list):
-            return cast(DataArrayT_co, list(arrays))
+            return cast(DataArrayT, list(arrays))
         if isinstance(arrays[0], dict):
             return {
                 key: stack_with_padding(
@@ -60,5 +60,10 @@ class Field(abc.ABC, Generic[DataArrayT_co]):
         return copy.deepcopy(self)
 
     @abc.abstractmethod
-    def as_array(self) -> DataArrayT_co:
+    def as_array(self) -> DataArrayT:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def from_array(cls: Type[Self], array: DataArrayT, **kwargs: Any) -> Self:
         raise NotImplementedError

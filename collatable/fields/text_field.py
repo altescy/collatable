@@ -1,4 +1,4 @@
-from typing import Callable, Generic, Hashable, Iterator, Mapping, Optional, Sequence, TypeVar
+from typing import Callable, Generic, Hashable, Iterator, Mapping, Optional, Protocol, Sequence, TypeVar
 
 import numpy
 
@@ -7,6 +7,12 @@ from collatable.fields.sequence_field import SequenceField
 
 Self = TypeVar("Self", bound="TextField")
 TokenT = TypeVar("TokenT", bound=Hashable)
+
+
+class IDecotableIndexer(Protocol[TokenT]):
+    def __call__(self, tokens: Sequence[TokenT], /) -> Mapping[str, numpy.ndarray]: ...
+
+    def decode(self, index: Mapping[str, numpy.ndarray], /) -> Sequence[TokenT]: ...
 
 
 class TextField(Generic[TokenT], SequenceField[Mapping[str, numpy.ndarray]]):
@@ -53,6 +59,17 @@ class TextField(Generic[TokenT], SequenceField[Mapping[str, numpy.ndarray]]):
 
     def as_array(self) -> Mapping[str, numpy.ndarray]:
         return self._indexed_tokens
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: Mapping[str, numpy.ndarray],
+        *,
+        indexer: IDecotableIndexer[TokenT],
+        padding_value: PaddingValue = 0,
+    ) -> "TextField":
+        tokens = indexer.decode(array)
+        return cls(tokens, indexer=indexer, padding_value=padding_value)
 
     @staticmethod
     def _make_indexer(vocab: Mapping[TokenT, int]) -> Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]:

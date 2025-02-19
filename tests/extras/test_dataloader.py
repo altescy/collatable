@@ -1,7 +1,7 @@
 from typing import Iterator
 
 from collatable import LabelField, MetadataField, TextField
-from collatable.extras.dataloader import DataLoader
+from collatable.extras.dataloader import DataLoader, DefaultBatchSampler
 from collatable.extras.dataset import Dataset
 from collatable.extras.indexer import LabelIndexer, TokenIndexer
 
@@ -43,14 +43,14 @@ def test_dataloader() -> None:
 
     dataset = Dataset.from_iterable(read_dataset())
 
-    dataloader = DataLoader(batch_size=2)
+    dataloader = DataLoader(DefaultBatchSampler(batch_size=2))
     batch_iterator = dataloader(dataset)
     assert len(batch_iterator) == 2
 
-    dataloader = DataLoader(batch_size=3, drop_last=True)
+    dataloader = DataLoader(DefaultBatchSampler(batch_size=3, drop_last=True))
     batch_iterator = dataloader(dataset)
     assert len(batch_iterator) == 1
 
-    dataloader = DataLoader(batch_size=2, shuffle=True)
+    dataloader = DataLoader(DefaultBatchSampler(batch_size=2, shuffle=True))
     batch_iterator = dataloader(dataset)
     assert all(len(batch["label"]) == 2 for batch in batch_iterator)

@@ -1,4 +1,4 @@
-from collatable.extras.dataloader import DataLoader  # noqa: F401
+from collatable.extras.dataloader import DataLoader, DefaultBatchSampler  # noqa: F401
 from collatable.extras.datamodule import (  # noqa: F401
     DataModule,
     FieldConfig,

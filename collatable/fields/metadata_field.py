@@ -23,6 +23,10 @@ class MetadataField(Field):
     def as_array(self) -> Any:
         return self._metadata
 
+    @classmethod
+    def from_array(cls, array: Any) -> "MetadataField":  # type: ignore[override]
+        return cls(array)
+
     def collate(self, arrays: Sequence[Any]) -> List[Any]:
         if isinstance(arrays[0], Field):
             arrays = [array.as_array() for array in arrays]

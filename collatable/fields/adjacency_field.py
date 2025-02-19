@@ -1,4 +1,4 @@
-from typing import Callable, Mapping, Optional, Sequence, Tuple, TypeVar, Union, cast
+from typing import Callable, Generic, Hashable, List, Mapping, Optional, Protocol, Sequence, Tuple, TypeVar, Union, cast
 
 import numpy
 
@@ -7,9 +7,16 @@ from collatable.fields.sequence_field import SequenceField
 from collatable.typing import IntTensor
 
 Self = TypeVar("Self", bound="AdjacencyField")
+LabelT = TypeVar("LabelT", bound=Hashable)
 
 
-class AdjacencyField(Field[IntTensor]):
+class IDecotableIndexer(Protocol[LabelT]):
+    def __call__(self, label: LabelT) -> int: ...
+
+    def decode(self, index: int) -> LabelT: ...
+
+
+class AdjacencyField(Generic[LabelT], Field[IntTensor]):
     __slots__ = ["_indices", "_labels", "_indexed_labels", "_sequence_length", "_padding_value"]
 
     def __init__(
@@ -17,9 +24,9 @@ class AdjacencyField(Field[IntTensor]):
         indices: Sequence[Tuple[int, int]],
         sequence_field: SequenceField,
         *,
-        labels: Optional[Union[Sequence[int], Sequence[str]]] = None,
-        vocab: Optional[Mapping[str, int]] = None,
-        indexer: Optional[Callable[[str], int]] = None,
+        labels: Optional[Union[Sequence[LabelT]]] = None,
+        vocab: Optional[Mapping[LabelT, int]] = None,
+        indexer: Optional[Callable[[LabelT], int]] = None,
         padding_value: PaddingValue = -1,
     ) -> None:
         if len(indices) == 0:
@@ -46,7 +53,7 @@ class AdjacencyField(Field[IntTensor]):
                 self._indexed_labels = cast(Sequence[int], self._labels)
             else:
                 assert indexer is not None
-                self._indexed_labels = [indexer(label) for label in cast(Sequence[str], self._labels)]
+                self._indexed_labels = [indexer(label) for label in self._labels]
 
     def __str__(self) -> str:
         return f"[{', '.join(str(index) for index in self._indices)}]"
@@ -55,8 +62,8 @@ class AdjacencyField(Field[IntTensor]):
         return f"AdjacencyField(indices={self._indices}, padding_value={self._padding_value})"
 
     @staticmethod
-    def _make_indexer(vocab: Mapping[str, int]) -> Callable[[str], int]:
-        def indexer(label: str) -> int:
+    def _make_indexer(vocab: Mapping[LabelT, int]) -> Callable[[LabelT], int]:
+        def indexer(label: LabelT) -> int:
             return vocab[label]
 
         return indexer
@@ -72,3 +79,25 @@ class AdjacencyField(Field[IntTensor]):
         for (i, j), label in zip(self._indices, labels):
             array[i, j] = label
         return array
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: IntTensor,
+        *,
+        sequence_field: SequenceField,
+        indexer: Optional[IDecotableIndexer[LabelT]] = None,
+        padding_value: PaddingValue = -1,
+    ) -> "AdjacencyField[LabelT]":
+        if array.ndim != 2:
+            raise ValueError(f"AdjacencyField expects a 2-dimensional array, but got shape {array.shape}")
+        indices = []
+        indexed_labels: List[LabelT] = []
+        for i, row in enumerate(array):
+            for j, label in enumerate(row):
+                if label != padding_value:
+                    indices.append((i, j))
+                    if indexer is not None:
+                        indexed_labels.append(indexer.decode(label))
+
+        return cls(indices, sequence_field, labels=indexed_labels, padding_value=padding_value)

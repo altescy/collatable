@@ -165,7 +165,7 @@ class Indexer(Generic[ValueT]):
 
 
 class TokenIndexer(Generic[ValueT], Indexer[ValueT]):
-    def __call__(self, tokens: Sequence[ValueT]) -> Dict[str, Tensor]:
+    def encode(self, tokens: Sequence[ValueT]) -> Mapping[str, Tensor]:
         token_ids = [self.get_index_by_value(value) for value in tokens]
         if self._bos_value is not None:
             token_ids = [self._value_to_index[self._bos_value]] + token_ids
@@ -173,7 +173,21 @@ class TokenIndexer(Generic[ValueT], Indexer[ValueT]):
             token_ids = token_ids + [self._value_to_index[self._eos_value]]
         return {"token_ids": numpy.array(token_ids, dtype=numpy.int64), "mask": numpy.ones(len(token_ids), dtype=bool)}
 
+    def decode(self, index: Mapping[str, Tensor]) -> Sequence[ValueT]:
+        token_ids = index["token_ids"]
+        mask = index["mask"]
+        return [self.get_value_by_index(token_id) for token_id, m in zip(token_ids, mask) if m]
+
+    def __call__(self, tokens: Sequence[ValueT]) -> Mapping[str, Tensor]:
+        return self.encode(tokens)
+
 
 class LabelIndexer(Generic[ValueT], Indexer[ValueT]):
-    def __call__(self, label: ValueT) -> int:
+    def encode(self, label: ValueT) -> int:
         return self.get_index_by_value(label)
+
+    def decode(self, index: int) -> ValueT:
+        return self.get_value_by_index(index)
+
+    def __call__(self, label: ValueT) -> int:
+        return self.encode(label)
