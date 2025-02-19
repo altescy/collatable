@@ -1,7 +1,7 @@
 from typing import Any, Dict, Mapping, Optional, Sequence, Set
 
 from collatable.fields import Field
-from collatable.typing import DataArray, INamedTuple
+from collatable.types import DataArray, INamedTuple
 
 
 class Collator:

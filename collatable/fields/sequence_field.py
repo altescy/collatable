@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
 from collatable.fields.field import Field
-from collatable.typing import DataArrayT
+from collatable.types import DataArrayT
 
 Self = TypeVar("Self", bound="SequenceField")
 

@@ -3,8 +3,8 @@ from typing import Optional
 import numpy
 
 from collatable.fields.field import Field
-from collatable.typing import ScalarT, Tensor
-from collatable.util import get_scalar_default_value
+from collatable.types import ScalarT, Tensor
+from collatable.utils import get_scalar_default_value
 
 
 class ScalarField(Field[Tensor]):

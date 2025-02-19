@@ -2,7 +2,7 @@ import numpy
 
 from collatable.fields.field import Field
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import IntTensor
+from collatable.types import IntTensor
 
 
 class IndexField(Field[IntTensor]):

@@ -2,7 +2,7 @@ from typing import List, Mapping, Sequence, Type, cast
 
 import numpy
 
-from collatable.typing import ArrayLike, DataArray, ScalarT, TensorT
+from collatable.types import ArrayLike, DataArray, ScalarT, TensorT
 
 
 def stack_with_padding(
