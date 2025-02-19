@@ -193,7 +193,6 @@ ids and decodes them back to raw texts/labels:
 from dataclasses import dataclass
 from typing import Mapping, Sequence, Union
 
-from collatable import LabelField, TextField
 from collatable.extras import DataLoader, Dataset, DefaultBatchSampler, LabelIndexer, TokenIndexer
 from collatable.extras.datamodule import DataModule, LabelFieldTransform, TextFieldTransform
 from collatable.utils import debatched
@@ -227,7 +226,6 @@ text2text_datamodule = DataModule[Text2TextExample](
 
 with shared_token_indexer.context(train=True), language_indexer.context(train=True):
     text2text_datamodule.build(text2text_dataset)
-
 
 dataloader = DataLoader(DefaultBatchSampler(batch_size=2))
 
