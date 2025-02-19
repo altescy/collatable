@@ -17,7 +17,7 @@ from typing import (
 
 import numpy
 
-from collatable.typing import Tensor
+from collatable.types import Tensor
 
 ValueT = TypeVar("ValueT", bound=Hashable)
 Self = TypeVar("Self", bound="Indexer")

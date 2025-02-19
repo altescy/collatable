@@ -4,8 +4,8 @@ from typing import Any, Dict, Generic, List, Sequence, Type, TypeVar, Union, cas
 
 import numpy
 
-from collatable.typing import ArrayLike, DataArrayT
-from collatable.util import stack_with_padding
+from collatable.types import ArrayLike, DataArrayT
+from collatable.utils import stack_with_padding
 
 Self = TypeVar("Self", bound="Field")
 PaddingValue = Union[Dict[str, ArrayLike], ArrayLike]

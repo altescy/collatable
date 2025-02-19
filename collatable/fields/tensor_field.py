@@ -3,7 +3,7 @@ from typing import Generic, cast
 import numpy
 
 from collatable.fields.field import Field
-from collatable.typing import ArrayLike, TensorT
+from collatable.types import ArrayLike, TensorT
 
 
 class TensorField(Generic[TensorT], Field[TensorT]):

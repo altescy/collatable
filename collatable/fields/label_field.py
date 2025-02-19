@@ -3,7 +3,7 @@ from typing import Callable, Generic, Hashable, Mapping, Optional, Protocol, Typ
 import numpy
 
 from collatable.fields.field import Field
-from collatable.typing import IntTensor
+from collatable.types import IntTensor
 
 Self = TypeVar("Self", bound="LabelField")
 LabelT = TypeVar("LabelT", bound=Hashable)

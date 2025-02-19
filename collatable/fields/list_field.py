@@ -2,7 +2,7 @@ from typing import Generic, Iterator, Optional, Sequence, Type
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import DataArrayT
+from collatable.types import DataArrayT
 
 
 class ListField(Generic[DataArrayT], SequenceField[DataArrayT]):

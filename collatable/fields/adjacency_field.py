@@ -4,7 +4,7 @@ import numpy
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
-from collatable.typing import IntTensor
+from collatable.types import IntTensor
 
 Self = TypeVar("Self", bound="AdjacencyField")
 LabelT = TypeVar("LabelT", bound=Hashable)

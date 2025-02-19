@@ -4,7 +4,7 @@ from typing import Dict, Iterable, Iterator, Mapping, Optional, Protocol, Sequen
 
 from collatable.collator import Collator
 from collatable.fields import Field
-from collatable.typing import DataArray
+from collatable.types import DataArray
 
 T = TypeVar("T")
 T_co = TypeVar("T_co", covariant=True)

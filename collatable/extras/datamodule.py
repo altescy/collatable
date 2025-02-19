@@ -18,7 +18,7 @@ from typing import (
 )
 
 from collatable import Field, LabelField, TextField
-from collatable.typing import DataArray, IntTensor, Scalar, Tensor
+from collatable.types import DataArray, IntTensor, Scalar, Tensor
 
 S = TypeVar("S")
 T = TypeVar("T")

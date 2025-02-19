@@ -196,7 +196,7 @@ from typing import Mapping, Sequence, Union
 from collatable import LabelField, TextField
 from collatable.extras import DataLoader, Dataset, DefaultBatchSampler, LabelIndexer, TokenIndexer
 from collatable.extras.datamodule import DataModule, LabelFieldTransform, TextFieldTransform
-from collatable.util import debatched
+from collatable.utils import debatched
 
 
 @dataclass
