@@ -1,4 +1,4 @@
-from typing import Callable, Generic, Hashable, Mapping, Optional, TypeVar
+from typing import Callable, Generic, Hashable, Mapping, Optional, Protocol, TypeVar, cast
 
 import numpy
 
@@ -7,6 +7,12 @@ from collatable.typing import IntTensor
 
 Self = TypeVar("Self", bound="LabelField")
 LabelT = TypeVar("LabelT", bound=Hashable)
+
+
+class IDecotableIndexer(Protocol[LabelT]):
+    def __call__(self, label: LabelT) -> int: ...
+
+    def decode(self, index: int) -> LabelT: ...
 
 
 class LabelField(Generic[LabelT], Field[IntTensor]):
@@ -48,6 +54,20 @@ class LabelField(Generic[LabelT], Field[IntTensor]):
 
     def as_array(self) -> IntTensor:
         return numpy.array(self._label_index, dtype=numpy.int32)
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: IntTensor,
+        *,
+        indexer: Optional[IDecotableIndexer[LabelT]] = None,
+    ) -> "LabelField":
+        if array.ndim != 0:
+            raise ValueError(f"LabelField expects a 0-dimensional array, but got shape {array.shape}")
+        label: LabelT = cast(LabelT, array.item())
+        if indexer is not None:
+            label = indexer.decode(array.item())
+        return cls(label, indexer=indexer)
 
     @staticmethod
     def _make_indexer(vocab: Mapping[LabelT, int]) -> Callable[[LabelT], int]:

@@ -27,3 +27,13 @@ class IndexField(Field[IntTensor]):
 
     def as_array(self) -> IntTensor:
         return numpy.array(self.index)
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: IntTensor,
+        sequence: SequenceField,
+    ) -> "IndexField":
+        if array.ndim != 0:
+            raise ValueError(f"IndexField expects a 0-dimensional array, but got shape {array.shape}")
+        return cls(array.item(), sequence)

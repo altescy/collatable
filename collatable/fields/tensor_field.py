@@ -35,3 +35,7 @@ class TensorField(Generic[TensorT], Field[TensorT]):
 
     def as_array(self) -> TensorT:
         return self._tensor
+
+    @classmethod
+    def from_array(cls, array: TensorT) -> "TensorField":  # type: ignore[override]
+        return cls(array)

@@ -28,3 +28,7 @@ class ScalarField(Field[Tensor]):
 
     def as_array(self) -> Tensor:
         return numpy.array(self._value)
+
+    @classmethod
+    def from_array(cls, array: Tensor) -> "ScalarField":  # type: ignore[override]
+        return cls(array.item())

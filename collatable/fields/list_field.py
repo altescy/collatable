@@ -1,4 +1,4 @@
-from typing import Generic, Iterator, Optional, Sequence
+from typing import Generic, Iterator, Optional, Sequence, Type
 
 from collatable.fields.field import Field, PaddingValue
 from collatable.fields.sequence_field import SequenceField
@@ -37,3 +37,13 @@ class ListField(Generic[DataArrayT], SequenceField[DataArrayT]):
 
     def as_array(self) -> DataArrayT:
         return self.fields[0].collate(self.fields)
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: DataArrayT,
+        *,
+        item_type: Type[Field],
+        padding_value: Optional[PaddingValue] = None,
+    ) -> "ListField":
+        return cls([item_type.from_array(item) for item in array], padding_value=padding_value)

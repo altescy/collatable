@@ -45,3 +45,13 @@ class SpanField(Field[IntTensor]):
 
     def as_array(self) -> IntTensor:
         return numpy.array([self.span_start, self.span_end])
+
+    @classmethod
+    def from_array(  # type: ignore[override]
+        cls,
+        array: IntTensor,
+        sequence_field: SequenceField,
+    ) -> "SpanField":
+        if array.ndim != 1 or array.shape[0] != 2:
+            raise ValueError(f"SpanField expects a 1-dimensional array of length 2, but got shape {array.shape}")
+        return cls(array[0], array[1], sequence_field)
