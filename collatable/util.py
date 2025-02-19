@@ -1,8 +1,8 @@
-from typing import Sequence, Type, cast
+from typing import List, Mapping, Sequence, Type, cast
 
 import numpy
 
-from collatable.typing import ArrayLike, ScalarT, TensorT
+from collatable.typing import ArrayLike, DataArray, ScalarT, TensorT
 
 
 def stack_with_padding(
@@ -34,3 +34,14 @@ def get_scalar_default_value(cls: Type[ScalarT]) -> ScalarT:
     if issubclass(cls, complex):
         return cast(ScalarT, 0.0 + 0.0j)
     raise TypeError(f"Unsupported type: {cls}")
+
+
+def debatched(array: DataArray) -> List[DataArray]:
+    if isinstance(array, (Sequence, numpy.ndarray)):
+        return list(array)
+    if isinstance(array, Mapping):
+        keys = set(array)
+        debatched_values = {key: debatched(value) for key, value in array.items()}
+        batch_size = len(debatched_values[next(iter(keys))])
+        return [{key: debatched_values[key][index] for key in keys} for index in range(batch_size)]
+    raise TypeError(f"Unsupported type: {type(array)}")
