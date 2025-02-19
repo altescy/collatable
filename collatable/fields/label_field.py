@@ -10,9 +10,9 @@ LabelT = TypeVar("LabelT", bound=Hashable)
 
 
 class IDecotableIndexer(Protocol[LabelT]):
-    def __call__(self, label: LabelT) -> int: ...
+    def __call__(self, label: LabelT, /) -> int: ...
 
-    def decode(self, index: int) -> LabelT: ...
+    def decode(self, index: int, /) -> LabelT: ...
 
 
 class LabelField(Generic[LabelT], Field[IntTensor]):
@@ -61,7 +61,7 @@ class LabelField(Generic[LabelT], Field[IntTensor]):
         array: IntTensor,
         *,
         indexer: Optional[IDecotableIndexer[LabelT]] = None,
-    ) -> "LabelField":
+    ) -> "LabelField[LabelT]":
         if array.ndim != 0:
             raise ValueError(f"LabelField expects a 0-dimensional array, but got shape {array.shape}")
         label: LabelT = cast(LabelT, array.item())
