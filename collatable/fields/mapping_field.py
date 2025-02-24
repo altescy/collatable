@@ -1,11 +1,10 @@
-from collections import abc
 from typing import Any, Dict, Iterator, Mapping, Sequence, Tuple, Type
 
 from collatable.fields.field import Field
 from collatable.types import DataArray
 
 
-class MappingField(Field[Dict[str, Any]], abc.Mapping[str, Field]):
+class MappingField(Field[Dict[str, Any]], Mapping[str, Field]):
     def __init__(self, mapping: Mapping[str, Field]) -> None:
         super().__init__()
         self._mapping = mapping
