@@ -1,6 +1,6 @@
 [project]
 name = "collatable"
-version = "0.5.0"
+version = "0.6.0"
 description = "Constructing batched tensors for any machine learning tasks"
 authors = [
     {name="altescy", email="me@altescy.jp"},
