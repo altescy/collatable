@@ -1,6 +1,6 @@
 [project]
 name = "collatable"
-version = "0.5.0"
+version = "0.6.0"
 description = "Constructing batched tensors for any machine learning tasks"
 authors = [
     {name="altescy", email="me@altescy.jp"},
@@ -8,6 +8,16 @@ authors = [
 license = "MIT"
 readme = "README.md"
 keywords = ["python", "machine learning"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 requires-python = ">=3.8,<4.0"
 dependencies = [
     "numpy>=1.0.0,<1.26.4; python_version < '3.9'",
