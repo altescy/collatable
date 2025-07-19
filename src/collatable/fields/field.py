@@ -20,7 +20,7 @@ class Field(abc.ABC, Generic[DataArrayT]):
 
         self._padding_value = padding_value
 
-    def __eq__(self: Self, other: object) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(self, other.__class__):
             for cls in self.__class__.mro():
                 for attr in getattr(cls, "__slots__", []):
@@ -35,14 +35,19 @@ class Field(abc.ABC, Generic[DataArrayT]):
     def padding_value(self) -> Dict[str, ArrayLike]:
         return self._padding_value
 
-    def collate(self: Self, arrays: Union[Sequence[DataArrayT], Sequence[Self]]) -> DataArrayT:
+    def collate(
+        self: Self, arrays: Union[Sequence[DataArrayT], Sequence[Self]]
+    ) -> DataArrayT:
         if isinstance(arrays[0], Field):
             arrays = [cast(Self, array).as_array() for array in arrays]
         arrays = cast(Sequence[DataArrayT], arrays)
         if isinstance(arrays[0], numpy.ndarray):
             return cast(
                 DataArrayT,
-                stack_with_padding(cast(Sequence[numpy.ndarray], arrays), padding_value=self.padding_value[""]),
+                stack_with_padding(
+                    cast(Sequence[numpy.ndarray], arrays),
+                    padding_value=self.padding_value[""],
+                ),
             )
         if isinstance(arrays[0], list):
             return cast(DataArrayT, list(arrays))

@@ -18,7 +18,7 @@ class ScalarField(Field[Tensor]):
         if padding_value is None:
             padding_value = get_scalar_default_value(type(value))
         super().__init__(padding_value=padding_value)
-        self._value: ScalarT = value
+        self._value = value
 
     def __str__(self) -> str:
         return str(self._value)

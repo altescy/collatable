@@ -41,11 +41,13 @@ class Indexer(Generic[ValueT]):
             raise ValueError("default value must be in specials")
 
         self._index_to_value: List[ValueT] = list(specials)
-        self._value_to_index: Dict[ValueT, int] = {value: index for index, value in enumerate(specials)}
+        self._value_to_index: Dict[ValueT, int] = {
+            value: index for index, value in enumerate(specials)
+        }
         self._ignores: Set[ValueT] = set(ignores)
-        self._bos_value = bos
-        self._eos_value = eos
-        self._default_value = default
+        self._bos_value = cast(ValueT, bos)
+        self._eos_value = cast(ValueT, eos)
+        self._default_value = cast(ValueT, default)
         self._training = False
 
     def __len__(self) -> int:
@@ -103,7 +105,9 @@ class Indexer(Generic[ValueT]):
         eos: Optional[ValueT] = None,
         default: Optional[ValueT] = None,
     ) -> "Indexer[ValueT]":
-        indexer = cls(ignores=ignores, specials=specials, bos=bos, eos=eos, default=default)
+        indexer = cls(
+            ignores=ignores, specials=specials, bos=bos, eos=eos, default=default
+        )
         with indexer.context(train=True):
             for value in iterable:
                 indexer[value]
@@ -155,7 +159,9 @@ class Indexer(Generic[ValueT]):
         min_df = int(min_df) if isinstance(min_df, int) else int(min_df * num_documents)
         max_df = int(max_df) if isinstance(max_df, int) else int(max_df * num_documents)
 
-        indexer = cls(ignores=ignores, specials=specials, bos=bos, eos=eos, default=default)
+        indexer = cls(
+            ignores=ignores, specials=specials, bos=bos, eos=eos, default=default
+        )
         with indexer.context(train=True):
             for token, df in list(value_to_df.items()):
                 if min_df <= df <= max_df:
@@ -171,12 +177,19 @@ class TokenIndexer(Generic[ValueT], Indexer[ValueT]):
             token_ids = [self._value_to_index[self._bos_value]] + token_ids
         if self._eos_value is not None:
             token_ids = token_ids + [self._value_to_index[self._eos_value]]
-        return {"token_ids": numpy.array(token_ids, dtype=numpy.int64), "mask": numpy.ones(len(token_ids), dtype=bool)}
+        return {
+            "token_ids": numpy.array(token_ids, dtype=numpy.int64),
+            "mask": numpy.ones(len(token_ids), dtype=bool),
+        }
 
     def decode(self, index: Mapping[str, Tensor]) -> Sequence[ValueT]:
         token_ids = index["token_ids"]
         mask = index["mask"]
-        return [self.get_value_by_index(token_id) for token_id, m in zip(token_ids, mask) if m]
+        return [
+            self.get_value_by_index(token_id)
+            for token_id, m in zip(token_ids, mask)
+            if m
+        ]
 
     def __call__(self, tokens: Sequence[ValueT]) -> Mapping[str, Tensor]:
         return self.encode(tokens)

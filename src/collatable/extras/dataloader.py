@@ -1,6 +1,15 @@
 import math
 import random
-from typing import Dict, Iterable, Iterator, Mapping, Optional, Protocol, Sequence, TypeVar
+from typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    TypeVar,
+)
 
 from collatable.collator import Collator
 from collatable.fields import Field
@@ -59,7 +68,9 @@ class DefaultBatchSampler:
 
     def __call__(self, dataset: Sequence) -> BatchIterator:
         num_batches = (
-            len(dataset) // self._batch_size if self._drop_last else math.ceil(len(dataset) / self._batch_size)
+            len(dataset) // self._batch_size
+            if self._drop_last
+            else math.ceil(len(dataset) / self._batch_size)
         )
         indices = list(range(len(dataset)))
         if self._shuffle:
@@ -83,5 +94,7 @@ class DataLoader:
         self._sampler = sampler or DefaultBatchSampler()
         self._collator = collator or Collator()
 
-    def __call__(self, dataset: Sequence[Mapping[str, Field]]) -> SizedIterator[Mapping[str, DataArray]]:
+    def __call__(
+        self, dataset: Sequence[Mapping[str, Field]]
+    ) -> SizedIterator[Mapping[str, DataArray]]:
         return self._sampler(dataset)

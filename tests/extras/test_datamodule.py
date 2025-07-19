@@ -1,8 +1,18 @@
 from dataclasses import dataclass
 from typing import Mapping, Sequence, Union
 
-from collatable.extras import DataLoader, Dataset, DefaultBatchSampler, LabelIndexer, TokenIndexer
-from collatable.extras.datamodule import DataModule, LabelFieldTransform, TextFieldTransform
+from collatable.extras import (
+    DataLoader,
+    Dataset,
+    DefaultBatchSampler,
+    LabelIndexer,
+    TokenIndexer,
+)
+from collatable.extras.datamodule import (
+    DataModule,
+    LabelFieldTransform,
+    TextFieldTransform,
+)
 from collatable.utils import debatched
 
 
@@ -18,7 +28,9 @@ def test_datamodule() -> None:
         Text2TextExample(source="what is your name?", target="My name is John."),
         Text2TextExample(source="where are you?", target="I am in New-York."),
         Text2TextExample(source="what is the time?", target="It is 10:00 AM."),
-        Text2TextExample(source="comment ça va?", target="Je vais bien.", language="fr"),
+        Text2TextExample(
+            source="comment ça va?", target="Je vais bien.", language="fr"
+        ),
     ]
 
     shared_token_indexer = TokenIndexer(default="<unk>", specials=["<pad>", "<unk>"])
@@ -26,8 +38,12 @@ def test_datamodule() -> None:
 
     text2text_datamodule = DataModule[Text2TextExample](
         fields={
-            "source": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
-            "target": TextFieldTransform(indexer=shared_token_indexer, pad_token="<pad>"),
+            "source": TextFieldTransform(
+                indexer=shared_token_indexer, pad_token="<pad>"
+            ),
+            "target": TextFieldTransform(
+                indexer=shared_token_indexer, pad_token="<pad>"
+            ),
             "language": LabelFieldTransform(indexer=language_indexer),
         }
     )

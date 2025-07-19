@@ -13,7 +13,11 @@ class ListField(Generic[DataArrayT], SequenceField[DataArrayT]):
         fields: Sequence[Field[DataArrayT]],
         padding_value: Optional[PaddingValue] = None,
     ) -> None:
-        super().__init__(padding_value=padding_value if padding_value is not None else fields[0].padding_value)
+        super().__init__(
+            padding_value=padding_value
+            if padding_value is not None
+            else fields[0].padding_value
+        )
         self._fields: Sequence[Field[DataArrayT]] = fields
 
     def __len__(self) -> int:
@@ -46,4 +50,6 @@ class ListField(Generic[DataArrayT], SequenceField[DataArrayT]):
         item_type: Type[Field],
         padding_value: Optional[PaddingValue] = None,
     ) -> "ListField":
-        return cls([item_type.from_array(item) for item in array], padding_value=padding_value)
+        return cls(
+            [item_type.from_array(item) for item in array], padding_value=padding_value
+        )

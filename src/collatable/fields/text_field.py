@@ -1,4 +1,14 @@
-from typing import Callable, Generic, Hashable, Iterator, Mapping, Optional, Protocol, Sequence, TypeVar
+from typing import (
+    Callable,
+    Generic,
+    Hashable,
+    Iterator,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    TypeVar,
+)
 
 import numpy
 
@@ -23,7 +33,9 @@ class TextField(Generic[TokenT], SequenceField[Mapping[str, numpy.ndarray]]):
         tokens: Sequence[TokenT],
         *,
         vocab: Optional[Mapping[TokenT, int]] = None,
-        indexer: Optional[Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]] = None,
+        indexer: Optional[
+            Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]
+        ] = None,
         padding_value: PaddingValue = 0,
     ) -> None:
         if (vocab is None is indexer) or (vocab is not None and indexer is not None):
@@ -72,9 +84,13 @@ class TextField(Generic[TokenT], SequenceField[Mapping[str, numpy.ndarray]]):
         return cls(tokens, indexer=indexer, padding_value=padding_value)
 
     @staticmethod
-    def _make_indexer(vocab: Mapping[TokenT, int]) -> Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]:
+    def _make_indexer(
+        vocab: Mapping[TokenT, int],
+    ) -> Callable[[Sequence[TokenT]], Mapping[str, numpy.ndarray]]:
         def indexer(tokens: Sequence[TokenT]) -> Mapping[str, numpy.ndarray]:
-            token_ids: numpy.ndarray = numpy.array([vocab[token] for token in tokens], dtype=numpy.int64)
+            token_ids: numpy.ndarray = numpy.array(
+                [vocab[token] for token in tokens], dtype=numpy.int64
+            )
             mask: numpy.ndarray = numpy.ones_like(token_ids, dtype=bool)
             output = {"token_ids": token_ids, "mask": mask}
             return output

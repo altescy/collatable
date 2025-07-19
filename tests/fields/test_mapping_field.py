@@ -27,17 +27,30 @@ def test_mapping_field_can_be_converted_to_array() -> None:
 
 def test_mapping_field_can_be_collated() -> None:
     class TokenIndexer:
-        VOCAB = {"<pad>": -1, "a": 0, "first": 1, "is": 2, "this": 3, "second": 4, "sentence": 5, "!": 6}
+        VOCAB = {
+            "<pad>": -1,
+            "a": 0,
+            "first": 1,
+            "is": 2,
+            "this": 3,
+            "second": 4,
+            "sentence": 5,
+            "!": 6,
+        }
         INV_VOCAB = {index: token for token, index in VOCAB.items()}
 
         def __call__(self, tokens: Sequence[str], /) -> Mapping[str, numpy.ndarray]:
             return {
-                "token_ids": numpy.array([self.VOCAB[token] for token in tokens], dtype=numpy.int64),
+                "token_ids": numpy.array(
+                    [self.VOCAB[token] for token in tokens], dtype=numpy.int64
+                ),
                 "mask": numpy.array([True] * len(tokens), dtype=numpy.bool_),
             }
 
         def decode(self, index: Mapping[str, numpy.ndarray], /) -> Sequence[str]:
-            return [self.INV_VOCAB[index] for index in index["token_ids"] if index != -1]
+            return [
+                self.INV_VOCAB[index] for index in index["token_ids"] if index != -1
+            ]
 
     class LabelIndexer:
         LABELS = {"negative": 0, "positive": 1}
@@ -56,7 +69,9 @@ def test_mapping_field_can_be_collated() -> None:
         MappingField(
             {
                 "text": TextField(
-                    ["this", "is", "a", "first", "sentence"], indexer=token_indexer, padding_value=padding_value
+                    ["this", "is", "a", "first", "sentence"],
+                    indexer=token_indexer,
+                    padding_value=padding_value,
                 ),
                 "label": LabelField("positive", indexer=label_indexer),
             }
@@ -64,7 +79,9 @@ def test_mapping_field_can_be_collated() -> None:
         MappingField(
             {
                 "text": TextField(
-                    ["this", "is", "a", "second", "sentence", "!"], indexer=token_indexer, padding_value=padding_value
+                    ["this", "is", "a", "second", "sentence", "!"],
+                    indexer=token_indexer,
+                    padding_value=padding_value,
                 ),
                 "label": LabelField("negative", indexer=label_indexer),
             }
@@ -75,7 +92,10 @@ def test_mapping_field_can_be_collated() -> None:
 
     assert isinstance(output, dict)
     assert output.keys() == {"text", "label"}
-    assert output["text"]["token_ids"].tolist() == [[3, 2, 0, 1, 5, -1], [3, 2, 0, 4, 5, 6]]
+    assert output["text"]["token_ids"].tolist() == [
+        [3, 2, 0, 1, 5, -1],
+        [3, 2, 0, 4, 5, 6],
+    ]
     assert output["text"]["mask"].sum(1).tolist() == [5, 6]
     assert output["label"].tolist() == [1, 0]
 
@@ -95,7 +115,14 @@ def test_mapping_field_can_be_collated() -> None:
     assert isinstance(reconstruction[0]["text"], TextField)
     assert isinstance(reconstruction[1]["text"], TextField)
     assert reconstruction[0]["text"].tokens == ["this", "is", "a", "first", "sentence"]
-    assert reconstruction[1]["text"].tokens == ["this", "is", "a", "second", "sentence", "!"]
+    assert reconstruction[1]["text"].tokens == [
+        "this",
+        "is",
+        "a",
+        "second",
+        "sentence",
+        "!",
+    ]
     assert isinstance(reconstruction[0]["label"], LabelField)
     assert isinstance(reconstruction[1]["label"], LabelField)
     assert reconstruction[0]["label"].label == "positive"

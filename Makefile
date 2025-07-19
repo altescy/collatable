@@ -1,7 +1,8 @@
 PWD      := $(shell pwd)
-PYTHON   := poetry run python
-PYTEST   := poetry run pytest
-PYSEN    := poetry run pysen
+PYTHON   := uv run python
+PYTEST   := uv run pytest
+PYRIGHT  := uv run pyright
+RUFF	 := uv run ruff
 MODULE   := collatable
 
 .PHONY: all
@@ -13,11 +14,13 @@ test:
 
 .PHONY: lint
 lint:
-	PYTHONPATH=$(PWD) $(PYSEN) run lint
+	PYTHONPATH=$(PWD) $(RUFF) check
+	PYTHONPATH=$(PWD) $(PYRIGHT)
 
 .PHONY: format
 format:
-	PYTHONPATH=$(PWD) $(PYSEN) run format
+	PYTHONPATH=$(PWD) $(RUFF) check --select I --fix
+	PYTHONPATH=$(PWD) $(RUFF) format
 
 .PHONY: clean
 clean: clean-pyc clean-build

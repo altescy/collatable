@@ -33,7 +33,11 @@ class Index(NamedTuple):
     length: int
 
     def to_bytes(self) -> bytes:
-        return self.page.to_bytes(4, "little") + self.offset.to_bytes(4, "little") + self.length.to_bytes(4, "little")
+        return (
+            self.page.to_bytes(4, "little")
+            + self.offset.to_bytes(4, "little")
+            + self.length.to_bytes(4, "little")
+        )
 
     @classmethod
     def from_binaryio(cls, f: BinaryIO) -> "Index":
@@ -186,9 +190,9 @@ class Dataset(Sequence[T]):
     def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> "List[T]": ...
+    def __getitem__(self, index: slice) -> List[T]: ...
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[T, List[T]]:
+    def __getitem__(self, key: Union[int, slice]) -> Union[T, List[T]]:  # type: ignore[override]
         if isinstance(key, slice):
             return [self[i] for i in range(*key.indices(len(self)))]
         elif isinstance(key, int):
