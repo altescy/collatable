@@ -77,11 +77,19 @@ class FieldTransform(Generic[S]):
         pass
 
     def indexers(self) -> Mapping[str, IIndexer]:
-        return dict((attribute, value) for attribute, value in self.__dict__.items() if isinstance(value, IIndexer))
+        return dict(
+            (attribute, value)
+            for attribute, value in self.__dict__.items()
+            if isinstance(value, IIndexer)
+        )
 
 
-class TextFieldTransform(Generic[HashableT], FieldTransform[Union[str, Sequence[HashableT]]]):
-    _DEFAULT_TOKENIZER_PATTERN = re.compile(r"[^\s.,!?:;/]+(?:[-']\[^\s.,!?:;/]+)*|[.,!?:;/]")
+class TextFieldTransform(
+    Generic[HashableT], FieldTransform[Union[str, Sequence[HashableT]]]
+):
+    _DEFAULT_TOKENIZER_PATTERN = re.compile(
+        r"[^\s.,!?:;/]+(?:[-']\[^\s.,!?:;/]+)*|[.,!?:;/]"
+    )
 
     def __init__(
         self,
@@ -93,7 +101,9 @@ class TextFieldTransform(Generic[HashableT], FieldTransform[Union[str, Sequence[
     ) -> None:
         from .indexer import TokenIndexer
 
-        self._tokenizer = tokenizer or (lambda text: self._DEFAULT_TOKENIZER_PATTERN.findall(text))
+        self._tokenizer = tokenizer or (
+            lambda text: self._DEFAULT_TOKENIZER_PATTERN.findall(text)
+        )
         self._indexer: ISequenceIndexer[HashableT, Mapping[str, Tensor]] = (
             indexer if indexer is not None else TokenIndexer[HashableT]()
         )
@@ -110,7 +120,9 @@ class TextFieldTransform(Generic[HashableT], FieldTransform[Union[str, Sequence[
         return TextField(
             obj,
             indexer=self._indexer.encode,
-            padding_value=self._indexer[self._pad_token] if self._pad_token is not None else 0,
+            padding_value=self._indexer[self._pad_token]
+            if self._pad_token is not None
+            else 0,
         )
 
     def reconstruct(self, array: DataArray) -> Sequence[HashableT]:
@@ -118,7 +130,9 @@ class TextFieldTransform(Generic[HashableT], FieldTransform[Union[str, Sequence[
         field = TextField[HashableT].from_array(
             array,
             indexer=self._indexer,
-            padding_value=self._indexer[self._pad_token] if self._pad_token is not None else 0,
+            padding_value=self._indexer[self._pad_token]
+            if self._pad_token is not None
+            else 0,
         )
         return field.tokens
 
@@ -141,7 +155,9 @@ class LabelFieldTransform(FieldTransform[HashableT]):
     ) -> None:
         from .indexer import LabelIndexer
 
-        self._indexer: IIndexer[HashableT, int] = indexer if indexer is not None else LabelIndexer[HashableT]()
+        self._indexer: IIndexer[HashableT, int] = (
+            indexer if indexer is not None else LabelIndexer[HashableT]()
+        )
 
     def __call__(self, obj: HashableT) -> LabelField:
         return LabelField(obj, indexer=self._indexer.encode)
@@ -193,7 +209,12 @@ class DataModule(Generic[T]):
 
     def __call__(self, dataset: Iterable[T]) -> Iterable[Dict[str, Field]]:
         for obj in dataset:
-            yield {name: field.transform(field.accessor(obj)) for name, field in self._fields.items()}
+            yield {
+                name: field.transform(field.accessor(obj))
+                for name, field in self._fields.items()
+            }
 
     def reconstruct(self, array: Mapping[str, DataArray]) -> Mapping[str, Any]:
-        return {name: field.reconstruct(array[name]) for name, field in self._fields.items()}
+        return {
+            name: field.reconstruct(array[name]) for name, field in self._fields.items()
+        }

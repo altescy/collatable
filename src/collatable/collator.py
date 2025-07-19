@@ -16,18 +16,26 @@ class Collator:
                     getattr(
                         instance,
                         "__slots__",
-                        [key for key in members if not key.startswith("_") or key in (self._field_names or [])],
+                        [
+                            key
+                            for key in members
+                            if not key.startswith("_")
+                            or key in (self._field_names or [])
+                        ],
                     )
                 )
                 if self._field_names is not None and not (self._field_names <= slots):
-                    raise ValueError(f"Field names {self._field_names - slots} not found")
+                    raise ValueError(
+                        f"Field names {self._field_names - slots} not found"
+                    )
                 instance = {slot: members[slot] for slot in slots if slot in members}
             elif isinstance(instance, INamedTuple):
                 instance = instance._asdict()
         return {
             key: value
             for key, value in instance.items()
-            if isinstance(value, Field) and (self._field_names is None or key in self._field_names)
+            if isinstance(value, Field)
+            and (self._field_names is None or key in self._field_names)
         }
 
     def __call__(self, instances: Sequence[Any]) -> Dict[str, DataArray]:

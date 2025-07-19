@@ -9,14 +9,19 @@ def test_sequence_label_field() -> None:
     label_vocab = {"O": 0, "B": 1, "I": 2, "U": 3}
     dataset = [
         (["O", "O", "O", "B", "I"], ["my", "name", "is", "john", "smith"]),
-        (["O", "O", "O", "U", "O", "O", "O"], ["i", "lived", "in", "japan", "three", "years", "ago"]),
+        (
+            ["O", "O", "O", "U", "O", "O", "O"],
+            ["i", "lived", "in", "japan", "three", "years", "ago"],
+        ),
     ]
     token_indexer = TokenIndexer[str]()
     fields = []
     with token_indexer.context(train=True):
         for labels, tokens in dataset:
             text_field = TextField(tokens, indexer=token_indexer)
-            sequence_label_field = SequenceLabelField(labels, text_field, vocab=label_vocab)
+            sequence_label_field = SequenceLabelField(
+                labels, text_field, vocab=label_vocab
+            )
             fields.append(sequence_label_field)
 
     output = fields[0].collate(fields)

@@ -9,7 +9,9 @@ from collatable.extras.indexer import LabelIndexer, TokenIndexer
 def test_dataloader() -> None:
     PAD_TOKEN = "<PAD>"
     UNK_TOKEN = "<UNK>"
-    token_indexer = TokenIndexer[str](specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN)
+    token_indexer = TokenIndexer[str](
+        specials=[PAD_TOKEN, UNK_TOKEN], default=UNK_TOKEN
+    )
     label_indexer = LabelIndexer[str]()
 
     def read_dataset() -> Iterator[dict]:

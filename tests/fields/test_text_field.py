@@ -18,8 +18,16 @@ def test_text_field_can_be_collated() -> None:
     vocab = {"a": 0, "first": 1, "is": 2, "this": 3, "second": 4, "sentence": 5, "!": 6}
     padding_value: PaddingValue = {"token_ids": -1}
     fields: List[TextField] = [
-        TextField(["this", "is", "a", "first", "sentence"], vocab=vocab, padding_value=padding_value),
-        TextField(["this", "is", "a", "second", "sentence", "!"], vocab=vocab, padding_value=padding_value),
+        TextField(
+            ["this", "is", "a", "first", "sentence"],
+            vocab=vocab,
+            padding_value=padding_value,
+        ),
+        TextField(
+            ["this", "is", "a", "second", "sentence", "!"],
+            vocab=vocab,
+            padding_value=padding_value,
+        ),
     ]
     output = fields[0].collate(fields)
     assert isinstance(output, dict)

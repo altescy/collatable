@@ -16,12 +16,32 @@ def test_adajacency_field() -> None:
     instances = []
     with token_indexer.context(train=True), label_indexer.context(train=True):
         text = TextField(
-            ["john", "smith", "was", "born", "in", "new", "york", "and", "now", "lives", "in", "tokyo"],
+            [
+                "john",
+                "smith",
+                "was",
+                "born",
+                "in",
+                "new",
+                "york",
+                "and",
+                "now",
+                "lives",
+                "in",
+                "tokyo",
+            ],
             indexer=token_indexer,
             padding_value=token_indexer[PAD_TOKEN],
         )
-        spans = ListField([SpanField(0, 2, text), SpanField(5, 7, text), SpanField(11, 12, text)])
-        relations = AdjacencyField([(0, 1), (0, 2)], spans, labels=["born-in", "lives-in"], indexer=label_indexer)
+        spans = ListField(
+            [SpanField(0, 2, text), SpanField(5, 7, text), SpanField(11, 12, text)]
+        )
+        relations = AdjacencyField(
+            [(0, 1), (0, 2)],
+            spans,
+            labels=["born-in", "lives-in"],
+            indexer=label_indexer,
+        )
         instance = dict(text=text, spans=spans, relations=relations)
         instances.append(instance)
 
@@ -31,7 +51,9 @@ def test_adajacency_field() -> None:
             padding_value=token_indexer[PAD_TOKEN],
         )
         spans = ListField([SpanField(0, 1, text), SpanField(5, 6, text)])
-        relations = AdjacencyField([(0, 1)], spans, labels=["capital-of"], indexer=label_indexer)
+        relations = AdjacencyField(
+            [(0, 1)], spans, labels=["capital-of"], indexer=label_indexer
+        )
         instance = dict(text=text, spans=spans, relations=relations)
         instances.append(instance)
 

@@ -10,7 +10,9 @@ class IndexField(Field[IntTensor]):
 
     def __init__(self, index: int, sequence: SequenceField) -> None:
         if index < 0 or index >= len(sequence):
-            raise ValueError(f"Index {index} is out of range for sequence of length {len(sequence)}")
+            raise ValueError(
+                f"Index {index} is out of range for sequence of length {len(sequence)}"
+            )
 
         super().__init__(padding_value=-1)
         self._index = index
@@ -35,5 +37,7 @@ class IndexField(Field[IntTensor]):
         sequence: SequenceField,
     ) -> "IndexField":
         if array.ndim != 0:
-            raise ValueError(f"IndexField expects a 0-dimensional array, but got shape {array.shape}")
+            raise ValueError(
+                f"IndexField expects a 0-dimensional array, but got shape {array.shape}"
+            )
         return cls(array.item(), sequence)

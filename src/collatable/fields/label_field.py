@@ -1,4 +1,13 @@
-from typing import Callable, Generic, Hashable, Mapping, Optional, Protocol, TypeVar, cast
+from typing import (
+    Callable,
+    Generic,
+    Hashable,
+    Mapping,
+    Optional,
+    Protocol,
+    TypeVar,
+    cast,
+)
 
 import numpy
 
@@ -53,7 +62,7 @@ class LabelField(Generic[LabelT], Field[IntTensor]):
         return self._label
 
     def as_array(self) -> IntTensor:
-        return numpy.array(self._label_index, dtype=numpy.int32)
+        return numpy.array(self._label_index, dtype=numpy.int_)
 
     @classmethod
     def from_array(  # type: ignore[override]
@@ -63,7 +72,9 @@ class LabelField(Generic[LabelT], Field[IntTensor]):
         indexer: Optional[IDecotableIndexer[LabelT]] = None,
     ) -> "LabelField[LabelT]":
         if array.ndim != 0:
-            raise ValueError(f"LabelField expects a 0-dimensional array, but got shape {array.shape}")
+            raise ValueError(
+                f"LabelField expects a 0-dimensional array, but got shape {array.shape}"
+            )
         label: LabelT = cast(LabelT, array.item())
         if indexer is not None:
             label = indexer.decode(array.item())

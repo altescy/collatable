@@ -22,7 +22,9 @@ class SpanField(Field[IntTensor]):
         if span_start > span_end:
             raise ValueError("Span start must be less than or equal to span end.")
         if span_end > len(sequence_field):
-            raise ValueError("Span end must be less than or equal to the length of the sequence.")
+            raise ValueError(
+                "Span end must be less than or equal to the length of the sequence."
+            )
 
         super().__init__(padding_value=padding_value)
 
@@ -53,5 +55,7 @@ class SpanField(Field[IntTensor]):
         sequence_field: SequenceField,
     ) -> "SpanField":
         if array.ndim != 1 or array.shape[0] != 2:
-            raise ValueError(f"SpanField expects a 1-dimensional array of length 2, but got shape {array.shape}")
+            raise ValueError(
+                f"SpanField expects a 1-dimensional array of length 2, but got shape {array.shape}"
+            )
         return cls(array[0], array[1], sequence_field)

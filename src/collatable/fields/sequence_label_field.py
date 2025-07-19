@@ -1,4 +1,15 @@
-from typing import Callable, Generic, Hashable, Iterator, Mapping, Optional, Protocol, Sequence, TypeVar, Union, cast
+from typing import (
+    Callable,
+    Generic,
+    Hashable,
+    Iterator,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    TypeVar,
+    cast,
+)
 
 import numpy
 
@@ -20,7 +31,7 @@ class SequenceLabelField(Generic[LabelT], SequenceField[IntTensor]):
 
     def __init__(
         self,
-        labels: Union[Sequence[LabelT]],
+        labels: Sequence[LabelT],
         sequence_field: SequenceField,
         *,
         vocab: Optional[Mapping[LabelT, int]] = None,
@@ -28,7 +39,9 @@ class SequenceLabelField(Generic[LabelT], SequenceField[IntTensor]):
         padding_value: PaddingValue = 0,
     ) -> None:
         if len(labels) != len(sequence_field):
-            raise ValueError("SequenceLabelField requires a label for every token in the sequence.")
+            raise ValueError(
+                "SequenceLabelField requires a label for every token in the sequence."
+            )
         if (vocab is None is indexer) or (vocab is not None and indexer is not None):
             raise ValueError("Must specify either vocab or indexer.")
         if vocab is not None:
@@ -77,7 +90,9 @@ class SequenceLabelField(Generic[LabelT], SequenceField[IntTensor]):
         indexer: Optional[IDecotableIndexer[LabelT]] = None,
     ) -> "SequenceLabelField[LabelT]":
         if array.ndim != 1:
-            raise ValueError(f"SequenceLabelField expects a 1-dimensional array, but got shape {array.shape}")
+            raise ValueError(
+                f"SequenceLabelField expects a 1-dimensional array, but got shape {array.shape}"
+            )
         labels: Sequence[LabelT] = cast(Sequence[LabelT], array.tolist())
         if indexer is not None:
             labels = [indexer.decode(index) for index in array]
